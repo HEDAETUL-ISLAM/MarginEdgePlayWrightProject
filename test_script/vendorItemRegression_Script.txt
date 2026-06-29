@@ -1,0 +1,71 @@
+Vendor Item Regression - Test Script
+======================================
+
+URL: https://me-63343.dev.marginedge.com
+User: accountmanager
+
+
+PRE-CONDITION: LOGIN
+--------------------
+1. Authentication is handled by global-setup using persistent browser context
+2. If session is expired, global-setup automatically logs in with:
+   - Username: accountmanager
+   - Password: -q*us3hnF82Wi6FGQWbF
+3. Session is stored in browser-data/ and reused across tests
+
+PRE-CONDITION: PRODUCT EXISTS
+-----------------------------
+- A product named "Automated Product" must already exist (created by productRegression)
+
+
+================================================================================
+PART 1: ADD VENDOR ITEM
+================================================================================
+
+
+TEST 1: Add New Vendor Item
+----------------------------
+1. Navigate to https://me-63343.dev.marginedge.com
+2. Wait for the "Vendors" nav link to be visible in the sidebar
+3. Click the "Vendors" nav link to expand the vendors submenu
+4. Wait for the "Vendor Items" button to appear in the submenu
+5. Click the "Vendor Items" button
+6. Verify the URL contains "vendorProduct"
+7. Click the "Add a new Vendor Item" link
+8. Wait for the add vendor item form to fully load (network idle)
+9. Click the "Select a vendor activate" toggle to open the vendor search input
+10. Type "Arrow" in the vendor search input (input[aria-label="Select a vendor"])
+11. Wait for the matching option to appear in the dropdown (.ui-select-choices-row)
+12. Select "Arrow" from the dropdown
+13. Fill in the vendor item name field with: Automated Item
+    - Field: textbox with label "Please enter a name for the"
+14. Click the "Select a product activate" toggle to open the product search input
+15. Type "Automated Product" in the product search input (input[aria-label="Select a product"])
+16. Wait for the matching option to appear in the dropdown (.ui-select-choices-row)
+17. Select "Automated Product" from the dropdown
+18. Click the "Add Packaging Option" button
+19. In the packaging grid (.ui-grid-row), fill in the last row:
+    a. Click the Packaging cell (1st cell), then fill with: 1 Case
+    b. Click the Quantity cell (2nd cell), then fill with: 1
+    c. Click the Unit cell (3rd cell), then select: Case
+    d. Click the Price cell (4th cell), then fill with: 80
+20. Click the "Save" button
+21. Wait for the save to complete (network idle)
+22. Navigate back to the Vendor Items page via the left nav
+23. Verify the URL contains "vendorProduct"
+24. Wait for the search input (input[ng-model="filterValue"][placeholder="Search"]) to be visible
+25. Click the search input and clear any existing text
+26. Type "Automated Item" character by character (keyboard.type) to trigger AngularJS filtering
+27. Wait 2 seconds for the table to filter
+28. Verify a table row containing "Automated Item" is visible
+
+Expected result:
+- The vendor item appears in the filtered table on the Vendor Items page
+- Console shows: Vendor Item "Automated Item" created successfully
+
+
+RESULTS SUMMARY
+----------------
+After all tests pass, the following summary is printed:
+
+  Add Vendor Item - passed

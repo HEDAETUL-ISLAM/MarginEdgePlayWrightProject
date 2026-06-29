@@ -1,0 +1,31 @@
+{
+  "baseUrl": "https://me-63384.dev.marginedge.com",
+  "routes": {
+    "orders": "/#/order/v2",
+    "inventorySetup": "/#/inventorySetup",
+    "inventory": "/#/inventory",
+    "menuItems": "/#/menuItem",
+    "products": "/#/product",
+    "vendorItems": "/#/vendorProduct",
+    "restaurantUnit": "/#/restaurantUnit"
+  },
+  "credentials": {
+    "username": "accountmanager",
+    "password": "-q*us3hnF82Wi6FGQWbF"
+  },
+  "timeouts": {
+    "short": 5000,
+    "default": 15000,
+    "long": 30000,
+    "extended": 60000,
+    "global": 300000
+  },
+  "testData": {
+    "invoiceImagePath": "C:\\Users\\hedaetul.islam_margi\\Pictures\\Screenshot\\testing_image.png",
+    "searchItemName": "FLAT LID PET PLASTIC FOR"
+  },
+  "browser": {
+    "userDataDir": "browser-data",
+    "args": ["--ignore-certificate-errors", "--disable-save-password-bubble", "--disable-features=PasswordManagerOnboarding"]
+  }
+}

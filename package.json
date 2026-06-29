@@ -1,0 +1,23 @@
+{
+  "name": "playwriteproject",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:report": "playwright show-report",
+    "test:recipe": "playwright test tests/recipes/recipeTestSuite.spec.ts --headed --project=chromium",
+    "mcp": "npx @playwright/mcp@latest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/mcp": "^0.0.76",
+    "@playwright/test": "^1.60.0",
+    "@types/node": "^26.0.0"
+  }
+}

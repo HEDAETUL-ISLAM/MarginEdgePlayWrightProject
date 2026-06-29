@@ -1,0 +1,173 @@
+Order Process - Test Script
+======================================
+
+URL: https://me-63343.dev.marginedge.com
+User: accountmanager
+
+
+PRE-CONDITION: LOGIN
+--------------------
+1. Authentication is handled by global-setup using persistent browser context
+2. If session is expired, global-setup automatically logs in with:
+   - Username: accountmanager
+   - Password: -q*us3hnF82Wi6FGQWbF
+3. Session is stored in browser-data/ and reused across tests
+
+PRE-CONDITION: VENDOR ITEM EXISTS
+----------------------------------
+- A vendor item named "Automated Item" must already exist (created by vendorItemRegression)
+
+
+================================================================================
+PART 1: UPLOAD & PREPROCESSING
+================================================================================
+
+
+TEST 1: Upload Invoice
+-----------------------
+1. Navigate to https://me-63343.dev.marginedge.com/#/order/v2
+2. Wait for the page to load
+3. Clear the search input field (input with placeholder "Search") to ensure no previous filters
+4. Click the "Add Invoice" dropdown button
+5. Wait for the dropdown menu to appear
+6. Click "Upload Invoice" from the menu
+7. File chooser dialog is intercepted — select testing_image.png automatically (no OS dialog shown)
+8. Wait for the upload to complete
+9. Close the "Upload Status" modal (click Close / Done / OK button)
+
+Expected result:
+- Invoice is uploaded and the upload status modal is dismissed
+
+
+TEST 2: End Preprocessing
+--------------------------
+1. Scroll to the bottom of the page
+2. Click the "End Preprocessing" button
+3. A confirmation dialog appears — click OK/Confirm button, or press Enter if no button found
+4. Wait for the page to load
+
+Expected result:
+- Preprocessing ends successfully
+
+
+TEST 3: Verify Invoice Status is "In Processing"
+-------------------------------------------------
+1. Navigate to https://me-63343.dev.marginedge.com/#/order/v2
+2. Verify that a cell with status "In Processing" is visible in the orders table
+
+Expected result:
+- The uploaded invoice appears with status "In Processing"
+
+
+================================================================================
+PART 2: INITIAL REVIEW
+================================================================================
+
+
+TEST 4: Complete Initial Review
+--------------------------------
+1. Navigate to https://me-63343.dev.marginedge.com/#/order/v2
+2. Find and click the first order row with "In Processing" status
+3. Wait for the order detail page to load
+4. Click "Select a vendor..." to open the vendor dropdown
+5. Type "Arrow" in the vendor search box
+6. Select "Arrow" from the search results
+7. Enter a random 6-digit number in the Invoice # field (3rd textbox in the form)
+8. Click the Invoice Date field (5th textbox in the form)
+   - If a "Today" button is available in the date picker, click it
+   - Otherwise, type today's date (YYYY-MM-DD) manually and press Tab
+9. If the Vendor Remittance Address section is visible:
+   - Check "No address is provided on the invoice."
+   - Check "No Phone number is provided on the invoice."
+10. Enter 80 in the Verified Total field (spinbutton)
+11. In the Handwriting dropdown (first combobox), select "No"
+12. Click "The initial review for this order is complete" checkbox/toggle
+13. Click the "Save and Complete" (or "Save") button
+14. Wait for the save to complete
+
+Expected result:
+- Initial review is saved and the order advances to reconciliation
+
+
+================================================================================
+PART 3: RECONCILIATION
+================================================================================
+
+
+TEST 5: Complete Reconciliation
+--------------------------------
+1. Navigate to https://me-63343.dev.marginedge.com/#/order/v2
+2. Search for the order by invoice number in the search box
+3. Click the matching order row to open it
+4. Wait for the lock warning: "This invoice is currently locked for automation processes"
+5. Click the "Process Invoice" button
+6. A confirmation dialog appears — click OK/Confirm button, or press Enter if no button found
+7. Wait for any loading spinner/overlay to disappear (.spinner, .loading, .loader, .overlay)
+8. Verify the "Reconcile Order" heading is visible (extended timeout)
+9. Wait for network idle (all pending requests complete)
+10. Wait for DOM content loaded
+11. Wait for the vendor dropdown ("Select a vendor activate") to be visible (extended timeout)
+12. Wait 2 seconds for AngularJS to finish rendering the form
+13. Click "Select a vendor..." and search for "Arrow"
+14. Select Arrow from the search results
+15. Fill the invoice number in the Invoice # field (3rd textbox)
+16. Click the Invoice Date field
+    - If a "Today" button is available, click it
+    - Otherwise, type today's date manually and press Tab
+17. If the Vendor Remittance Address section is visible:
+    - Check "No address is provided on the invoice."
+    - Check "No Phone number is provided on the invoice."
+18. Add a line item:
+    a. Click "Add Line Item" button
+    b. In the modal (#newReconcileLineItemModal), ensure "Existing Vendor Item" radio is selected
+    c. Open the item search input and type "Automated Item"
+    d. Select the matching item from the dropdown options
+    e. Enter Line Quantity: 1
+    f. Enter Unit Price: 80
+    g. Click OK button
+    h. If a packaging selection appears in the modal:
+       - Try to select "3 Cases" packaging first
+       - If not available, select "1 Case" packaging
+       - If neither available, select the first radio button in the table
+    i. Click Save in the modal
+    j. Close the modal if still open (click close button or press Escape)
+19. In the Handwriting dropdown, select "No"
+20. Click "The reconciliation for this order is complete" checkbox/toggle
+21. Click the "Save and Complete" (or "Save") button
+22. On the Order Verification modal, click the "Verified" button
+23. Navigate back to the orders list
+
+Expected result:
+- Reconciliation is completed and the order advances to final review
+
+
+================================================================================
+PART 4: FINAL REVIEW
+================================================================================
+
+
+TEST 6: Complete Final Review (Close Order)
+--------------------------------------------
+1. Navigate to https://me-63343.dev.marginedge.com/#/order/v2
+2. Search for the order by invoice number in the search box
+3. Verify the order row shows "In Progress" or "In Processing" status
+4. Click the matching order row to open it
+5. Scroll to "This order has been reviewed and should be closed" checkbox
+6. Click the checkbox to mark the order as reviewed for closing
+7. Click the "Save" button
+8. On the Order Verification modal, click the "Verified" button
+9. Navigate back to the orders list
+
+Expected result:
+- The order is closed successfully
+
+
+RESULTS SUMMARY
+----------------
+After all tests pass, the following summary is printed:
+
+  File Uploaded      - passed
+  End Preprocessing  - passed
+  Initial Review     - passed
+  Reconciliation     - passed
+  Final Review       - passed
