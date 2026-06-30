@@ -158,7 +158,39 @@ export class NewVendorItemsTaskPage extends BasePage {
   }
 
   async waitForTableRow() {
+    await this.page.waitForLoadState('networkidle', { timeout: TIMEOUT.extended }).catch(() => {});
     await this.firstRowCheckbox.waitFor({ state: 'visible', timeout: TIMEOUT.long });
+    await this.page.waitForTimeout(2000);
+  }
+
+  async selectFirstRowAndApprove() {
+    // Step 1: Wait for the table row to be fully visible and interactive
+    await this.waitForTableRow();
+
+    // Step 2: Select the first row checkbox
+    await this.firstRowCheckbox.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await this.page.waitForTimeout(1000);
+    await this.firstRowCheckbox.click();
+    await this.page.waitForTimeout(1000);
+
+    // Step 3: Verify the row is selected before clicking approve
+    const selectedRow = this.page.locator('.ui-grid-row.ui-grid-row-selected').first();
+    await selectedRow.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await this.page.waitForTimeout(1000);
+
+    // Step 4: Click Approve Selected
+    await this.approveSelectedButton.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await this.page.waitForTimeout(1000);
+    await this.approveSelectedButton.click();
+    await this.page.waitForTimeout(1000);
+
+    // Step 5: Wait for the "Approved!" modal to appear after the spinner
+    const okButton = this.page.locator('button.btn.btn-primary.bootbox-accept');
+    await okButton.waitFor({ state: 'visible', timeout: TIMEOUT.long });
+    await this.page.waitForTimeout(1000);
+    await okButton.click();
+    await this.page.waitForTimeout(1000);
+    await this.waitForPageLoad();
     await this.page.waitForTimeout(1000);
   }
 

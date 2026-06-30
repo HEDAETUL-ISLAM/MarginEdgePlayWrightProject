@@ -8,7 +8,9 @@
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
     "test:report": "playwright show-report",
-    "test:recipe": "playwright test tests/recipes/recipeTestSuite.spec.ts --headed --project=chromium",
+    "test:recipe": "npx playwright test tests/recipes/recipeTestSuite.spec.ts --headed --project=chromium",
+    "test:legacy-recon": "npx playwright test tests/invoiceProcessing/legacyReconciliationProcess.spec.ts --headed --project=legacyReconciliation",
+    "test:edi-invoices": "npx playwright test tests/invoiceProcessing/ediInvoices.spec.ts --headed --project=chromium",
     "mcp": "npx @playwright/mcp@latest"
   },
   "keywords": [],

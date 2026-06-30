@@ -279,9 +279,7 @@ test.describe('Legacy Reconciliation Process', () => {
   });
 
   test('Approve new vendor item', async () => {
-    await newVendorItemsTaskPage.waitForTableRow();
-    await newVendorItemsTaskPage.selectFirstRow();
-    await newVendorItemsTaskPage.clickApproveSelected();
+    await newVendorItemsTaskPage.selectFirstRowAndApprove();
     results['Approve New Vendor Item'] = 'passed';
   });
 
