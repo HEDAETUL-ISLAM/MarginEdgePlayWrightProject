@@ -107,6 +107,65 @@ export class VendorItemPage extends BasePage {
     await this.page.waitForTimeout(500);
   }
 
+  async searchVendorItem(name: string) {
+    const searchInput = this.page.locator('input[ng-model="filterValue"][placeholder="Search"]');
+    await searchInput.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await searchInput.clear();
+    await searchInput.fill(name);
+    await this.page.waitForTimeout(2000);
+  }
+
+  async clickVendorItemSearchResult(name: string) {
+    const row = this.page.getByRole('row').filter({ hasText: name }).first();
+    await row.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await row.click();
+    await this.waitForPageLoad();
+    await this.page.waitForTimeout(2000);
+  }
+
+  async clickEditVendorItem() {
+    const editButton = this.page.locator('button[ui-sref*="vendorProductEdit"]');
+    await editButton.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await editButton.click();
+    await this.waitForPageLoad();
+    await this.page.waitForTimeout(2000);
+  }
+
+  async checkAndFixPackagingRatio(ratioValue: string) {
+    const lastRow = this.page.locator('.ui-grid-row').last();
+    await lastRow.scrollIntoViewIfNeeded();
+    await this.page.waitForTimeout(1000);
+
+    // Find the Ratio cell in the last row (typically the last or second-to-last column)
+    const cells = lastRow.locator('.ui-grid-cell');
+    const cellCount = await cells.count();
+
+    // Look for a cell containing "0" as the ratio value
+    for (let i = 0; i < cellCount; i++) {
+      const cellText = await cells.nth(i).locator('.ui-grid-cell-contents').textContent();
+      if (cellText?.trim() === '0') {
+        await cells.nth(i).locator('.ui-grid-cell-contents').click();
+        await this.page.waitForTimeout(500);
+        const input = cells.nth(i).locator('input');
+        await input.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+        await input.clear();
+        await input.fill(ratioValue);
+        await this.page.waitForTimeout(500);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  async scrollToBottomAndSave() {
+    await this.page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await this.page.waitForTimeout(1000);
+    await this.saveButton.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await this.saveButton.click();
+    await this.page.waitForLoadState('networkidle', { timeout: TIMEOUT.long });
+    await this.page.waitForTimeout(2000);
+  }
+
   async clickSave() {
     await this.saveButton.waitFor({ state: 'visible', timeout: TIMEOUT.default });
     await this.saveButton.click();
