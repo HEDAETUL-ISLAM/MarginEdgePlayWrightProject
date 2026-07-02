@@ -197,10 +197,25 @@ export class OrderPage extends BasePage {
     await totalInput.fill(amount);
   }
 
+  async scrollToHandwritingSection() {
+    const handwritingSection = this.page.getByText(/handwriting and other adjustments/i).first();
+    await handwritingSection.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await handwritingSection.scrollIntoViewIfNeeded();
+    await this.page.waitForTimeout(1000);
+  }
+
   async setHandwritingToNo() {
-    const handwritingSelect = this.page.locator('form').getByRole('combobox').first();
+    const handwritingSelect = this.page.locator('select[name="handwrittenMarkup"]');
     await handwritingSelect.waitFor({ state: 'visible', timeout: TIMEOUT.default });
-    await handwritingSelect.selectOption('No');
+    await handwritingSelect.scrollIntoViewIfNeeded();
+    await this.page.waitForTimeout(500);
+    // Set value via DOM and dispatch change event for AngularJS binding
+    await this.page.evaluate(() => {
+      const select = document.querySelector('select[name="handwrittenMarkup"]') as HTMLSelectElement;
+      select.value = 'boolean:false';
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    await this.page.waitForTimeout(1000);
   }
 
   async markInitialReviewComplete() {
@@ -489,9 +504,7 @@ export class OrderPage extends BasePage {
   }
 
   async searchOrderInList(invoiceNumber: string) {
-    const searchInput = this.page.getByPlaceholder(/search/i)
-      .or(this.page.locator('input[type="search"]'))
-      .first();
+    const searchInput = this.page.locator('input.MuiInputBase-input[placeholder="Search"]');
     await searchInput.waitFor({ state: 'visible', timeout: TIMEOUT.default });
     await searchInput.fill(invoiceNumber);
     await this.page.waitForTimeout(1000);
