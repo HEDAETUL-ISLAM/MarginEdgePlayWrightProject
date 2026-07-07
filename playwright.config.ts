@@ -7,7 +7,10 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: 'html',
+  reporter: [
+    ['html'],
+    ['./reporters/jira-reporter.ts'],
+  ],
   timeout: 300000,
   use: {
     trace: 'on-first-retry',

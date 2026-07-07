@@ -26,3 +26,9 @@ npm run test:recipe
 ```bash
 npx playwright test tests/recipes/recipeTestSuite.spec.ts --headed --project=chromium
 ```
+
+## Run Tests with Jira Reporting
+
+```bash
+JIRA_TICKET=ME-1234 JIRA_BASE_URL=https://marginedge.atlassian.net JIRA_EMAIL=user@co.com JIRA_API_TOKEN=xxx npm run test:recipe
+```

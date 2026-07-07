@@ -57,9 +57,7 @@ test.describe('Legacy Reconciliation Process', () => {
     logResults();
   });
 
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║                        Team Assignments                               ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- Team Assignments ---
 
   test('Navigate to Team Assignments', async () => {
     await teamAssignmentsPage.navigateToUsersViaLeftNav();
@@ -81,14 +79,12 @@ test.describe('Legacy Reconciliation Process', () => {
     results['Assign Lead Analyst to Second Analyst'] = 'passed';
   });
 
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║                        User Office Setup                              ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- User Office Setup ---
 
   test('Set office to Dhaka for first analyst', async () => {
     await userPage.navigateToSetupUsersViaLeftNav();
     await userPage.selectMarginEdgeStaff();
-    await userPage.searchUser('Analyst');
+    await userPage.searchUser('the');
     await userPage.openUserRow(1);
     await userPage.selectOffice('Dhaka');
     await userPage.scrollToBottomAndSave();
@@ -97,25 +93,23 @@ test.describe('Legacy Reconciliation Process', () => {
 
   test('Set office to Dhaka for second analyst', async () => {
     await userPage.selectMarginEdgeStaff();
-    await userPage.searchUser('Analyst');
-    await userPage.openUserRow(2);
+    await userPage.searchUser('second');
+    await userPage.openUserRow(1);
     await userPage.selectOffice('Dhaka');
     await userPage.scrollToBottomAndSave();
     results['Set Office for Analyst 2'] = 'passed';
   });
 
-  test('Set office to Dhaka for third analyst', async () => {
+  test('Set office to Dhaka for lead analyst', async () => {
     await userPage.selectMarginEdgeStaff();
-    await userPage.searchUser('Analyst');
-    await userPage.openUserRow(3);
+    await userPage.searchUser('lead');
+    await userPage.openUserRow(1);
     await userPage.selectOffice('Dhaka');
     await userPage.scrollToBottomAndSave();
-    results['Set Office for Analyst 3'] = 'passed';
+    results['Set Office for Lead Analyst'] = 'passed';
   });
 
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║                     Product & Vendor Item Setup                       ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- Product & Vendor Item Setup ---
 
   test('Add new product', async () => {
     await productPage.navigateViaLeftNav();
@@ -143,9 +137,7 @@ test.describe('Legacy Reconciliation Process', () => {
     results['Add Vendor Item'] = 'passed';
   });
 
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║                   Invoice Upload & Preprocessing                      ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- Invoice Upload & Preprocessing ---
 
   test('Upload invoice', async () => {
     await orderPage.navigateToOrdersList();
@@ -165,9 +157,7 @@ test.describe('Legacy Reconciliation Process', () => {
     await orderPage.verifyInvoiceStatusInProcessing();
   });
 
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║                          Initial Review                               ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- Initial Review ---
 
   test('Logout', async () => {
     await logInOutPage.logout();
@@ -195,9 +185,7 @@ test.describe('Legacy Reconciliation Process', () => {
     results['Initial Review'] = 'passed';
   });
 
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║                          Reconciliation                               ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- Reconciliation ---
 
   test('Logout analyst', async () => {
     await logInOutPage.logout();
@@ -233,9 +221,7 @@ test.describe('Legacy Reconciliation Process', () => {
     results['Reconciliation'] = 'passed';
   });
 
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║                           Final Review                                ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- Final Review ---
 
   test('Logout analyst2', async () => {
     await logInOutPage.logout();
@@ -258,9 +244,7 @@ test.describe('Legacy Reconciliation Process', () => {
     results['Final Review'] = 'passed';
   });
 
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║                   New Vendor Item Approval                            ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- New Vendor Item Approval ---
 
   test('Logout leadanalyst', async () => {
     await logInOutPage.logout();
@@ -283,9 +267,7 @@ test.describe('Legacy Reconciliation Process', () => {
     results['Approve New Vendor Item'] = 'passed';
   });
 
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║                     Invoice Status Verification                       ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- Invoice Status Verification ---
 
   test('Verify invoice status is Closed', async () => {
     await orderPage.navigateToOrdersList();

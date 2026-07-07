@@ -5,7 +5,20 @@ export const config = devConfig;
 export const TIMEOUT = config.timeouts;
 
 export class BasePage {
-  constructor(protected readonly page: Page) {}
+  constructor(protected readonly page: Page) {
+    // Auto-close photo viewer tabs when they open
+    page.context().on('page', async (newPage) => {
+      try {
+        await newPage.waitForLoadState('domcontentloaded', { timeout: 5000 }).catch(() => {});
+        if (newPage.url().includes('/photoViewer')) {
+          await newPage.close();
+          await page.bringToFront();
+        }
+      } catch {
+        // Page may already be closed
+      }
+    });
+  }
 
   get baseUrl(): string {
     return config.baseUrl;

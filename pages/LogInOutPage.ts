@@ -40,7 +40,10 @@ export class LogInOutPage extends BasePage {
   }
 
   async logout() {
-    await this.navigateTo(this.baseUrl, TIMEOUT.extended);
+    await this.page.waitForLoadState('networkidle', { timeout: TIMEOUT.default }).catch(() => {});
+    await this.page.waitForTimeout(1000);
+    await this.page.goto(`${this.baseUrl}/#/orders`, { waitUntil: 'domcontentloaded', timeout: TIMEOUT.extended });
+    await this.page.waitForTimeout(1000);
     await this.userNameDropdown.waitFor({ state: 'visible', timeout: TIMEOUT.extended });
     await this.userNameDropdown.click();
     await this.page.waitForTimeout(500);

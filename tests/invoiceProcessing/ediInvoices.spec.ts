@@ -9,6 +9,7 @@ import { UserPage } from '../../pages/users/UserPage';
 import { VendorItemPage } from '../../pages/vendorItem/VendorItemPage';
 import { OrderPage } from '../../pages/reconciliation/OrderPage';
 import { PriorityReportPage } from '../../pages/reconciliation/PriorityReportPage';
+import { NewVendorItemsTaskPage } from '../../pages/reconciliation/NewVendorItemsTaskPage';
 import { testNames } from '../../fixtures/testData';
 import * as path from 'path';
 
@@ -24,6 +25,7 @@ test.describe('EDI Invoices', () => {
   let vendorItemPage: VendorItemPage;
   let orderPage: OrderPage;
   let priorityReportPage: PriorityReportPage;
+  let newVendorItemsTaskPage: NewVendorItemsTaskPage;
 
   const { results, logResults } = createResultsTracker('EDI Invoices', [
     'Assign Lead Analyst to The Analyst',
@@ -35,6 +37,9 @@ test.describe('EDI Invoices', () => {
     'Local Vendor EDI Config',
     'Reconciliation',
     'Final Review',
+    'Assign New Vendor Item Product',
+    'Approve New Vendor Item',
+    'Invoice Closed',
   ]);
 
   test.beforeAll(async ({ persistentPage }) => {
@@ -48,116 +53,107 @@ test.describe('EDI Invoices', () => {
     vendorItemPage = new VendorItemPage(persistentPage);
     orderPage = new OrderPage(persistentPage);
     priorityReportPage = new PriorityReportPage(persistentPage);
+    newVendorItemsTaskPage = new NewVendorItemsTaskPage(persistentPage);
   });
 
   test.afterAll(async () => {
     logResults();
   });
 
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║                        Team Assignments                               ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- Team Assignments ---
 
-  // test('Navigate to Team Assignments', async () => {
-  //   await teamAssignmentsPage.navigateToUsersViaLeftNav();
-  //   await teamAssignmentsPage.clickTeamAssignments();
-  // });
+  test('Navigate to Team Assignments', async () => {
+    await teamAssignmentsPage.navigateToUsersViaLeftNav();
+    await teamAssignmentsPage.clickTeamAssignments();
+  });
 
-  // test('Assign Lead Analyst to The Analyst', async () => {
-  //   await teamAssignmentsPage.searchAnalyst('The Analyst');
-  //   await teamAssignmentsPage.selectLeadAnalystFromDropdown();
-  //   await teamAssignmentsPage.clickSaveChanges();
-  //   results['Assign Lead Analyst to The Analyst'] = 'passed';
-  // });
+  test('Assign Lead Analyst to The Analyst', async () => {
+    await teamAssignmentsPage.searchAnalyst('The Analyst');
+    await teamAssignmentsPage.selectLeadAnalystFromDropdown();
+    await teamAssignmentsPage.clickSaveChanges();
+    results['Assign Lead Analyst to The Analyst'] = 'passed';
+  });
 
-  // test('Assign Lead Analyst to Second Analyst', async () => {
-  //   await teamAssignmentsPage.clearSearch();
-  //   await teamAssignmentsPage.searchAnalyst('Second Analyst');
-  //   await teamAssignmentsPage.selectLeadAnalystFromDropdown();
-  //   await teamAssignmentsPage.clickSaveChanges();
-  //   results['Assign Lead Analyst to Second Analyst'] = 'passed';
-  // });
+  test('Assign Lead Analyst to Second Analyst', async () => {
+    await teamAssignmentsPage.clearSearch();
+    await teamAssignmentsPage.searchAnalyst('Second Analyst');
+    await teamAssignmentsPage.selectLeadAnalystFromDropdown();
+    await teamAssignmentsPage.clickSaveChanges();
+    results['Assign Lead Analyst to Second Analyst'] = 'passed';
+  });
 
-  // // ╔═════════════════════════════════════════════════════════════════════════╗
-  // // ║                        User Office Setup                              ║
-  // // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- User Office Setup ---
 
-  // test('Set office to Dhaka for first analyst', async () => {
-  //   await userPage.navigateToSetupUsersViaLeftNav();
-  //   await userPage.selectMarginEdgeStaff();
-  //   await userPage.searchUser('Analyst');
-  //   await userPage.openUserRow(1);
-  //   await userPage.selectOffice('Dhaka');
-  //   await userPage.scrollToBottomAndSave();
-  //   results['Set Office for Analyst 1'] = 'passed';
-  // });
+  test('Set office to Dhaka for first analyst', async () => {
+    await userPage.navigateToSetupUsersViaLeftNav();
+    await userPage.selectMarginEdgeStaff();
+    await userPage.searchUser('the');
+    await userPage.openUserRow(1);
+    await userPage.selectOffice('Dhaka');
+    await userPage.scrollToBottomAndSave();
+    results['Set Office for Analyst 1'] = 'passed';
+  });
 
-  // test('Set office to Dhaka for second analyst', async () => {
-  //   await userPage.selectMarginEdgeStaff();
-  //   await userPage.searchUser('Analyst');
-  //   await userPage.openUserRow(2);
-  //   await userPage.selectOffice('Dhaka');
-  //   await userPage.scrollToBottomAndSave();
-  //   results['Set Office for Analyst 2'] = 'passed';
-  // });
+  test('Set office to Dhaka for second analyst', async () => {
+    await userPage.selectMarginEdgeStaff();
+    await userPage.searchUser('second');
+    await userPage.openUserRow(1);
+    await userPage.selectOffice('Dhaka');
+    await userPage.scrollToBottomAndSave();
+    results['Set Office for Analyst 2'] = 'passed';
+  });
 
-  // test('Set office to Dhaka for third analyst', async () => {
-  //   await userPage.selectMarginEdgeStaff();
-  //   await userPage.searchUser('Analyst');
-  //   await userPage.openUserRow(3);
-  //   await userPage.selectOffice('Dhaka');
-  //   await userPage.scrollToBottomAndSave();
-  //   results['Set Office for Analyst 3'] = 'passed';
-  // });
+  test('Set office to Dhaka for lead analyst', async () => {
+    await userPage.selectMarginEdgeStaff();
+    await userPage.searchUser('lead');
+    await userPage.openUserRow(1);
+    await userPage.selectOffice('Dhaka');
+    await userPage.scrollToBottomAndSave();
+    results['Set Office for Lead Analyst'] = 'passed';
+  });
 
-  // // ╔═════════════════════════════════════════════════════════════════════════╗
-  // // ║                     Central Vendor EDI Config                         ║
-  // // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- Central Vendor EDI Config ---
 
-  // test('Navigate to Central Vendors', async () => {
-  //   await centralVendorPage.navigateToCentralVendors();
-  // });
+  test('Navigate to Central Vendors', async () => {
+    await centralVendorPage.navigateToCentralVendors();
+  });
 
-  // test('Search and open central vendor JFC', async () => {
-  //   await centralVendorPage.searchCentralVendor('JFC');
-  //   await centralVendorPage.openCentralVendorRow();
-  // });
+  test('Search and open central vendor JFC', async () => {
+    await centralVendorPage.searchCentralVendor('JFC');
+    await centralVendorPage.openCentralVendorRow();
+  });
 
-  // test('Setup EDI vendor format', async () => {
-  //   const hasEdiRow = await centralVendorPage.hasCentralVendorEdiFormatRow('marginedge.com');
+  test('Setup EDI vendor format', async () => {
+    const hasEdiRow = await centralVendorPage.hasCentralVendorEdiFormatRow('marginedge.com');
 
-  //   if (!hasEdiRow) {
-  //     await centralVendorPage.addCentralVendorInboundEdiFormat('marginedge.com');
-  //   }
+    if (!hasEdiRow) {
+      await centralVendorPage.addCentralVendorInboundEdiFormat('marginedge.com');
+    }
 
-  //   await centralVendorPage.scrollToBottomAndSaveCentralVendor();
-  //   results['Central Vendor EDI Config'] = 'passed';
-  // });
+    await centralVendorPage.scrollToBottomAndSaveCentralVendor();
+    results['Central Vendor EDI Config'] = 'passed';
+  });
 
-  // // ╔═════════════════════════════════════════════════════════════════════════╗
-  // // ║                      Local Vendor EDI Config                          ║
-  // // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- Local Vendor EDI Config ---
 
-  // test('Navigate to Vendors', async () => {
-  //   await vendorPage.navigateToVendors();
-  // });
+  test('Navigate to Vendors', async () => {
+    await vendorPage.navigateToVendors();
+  });
 
-  // test('Search and open vendor JFC', async () => {
-  //   await vendorPage.searchVendor('JFC');
-  //   await vendorPage.clickVendorSearchResult('JFC');
-  // });
+  test('Search and open vendor JFC', async () => {
+    await vendorPage.searchVendor('JFC');
+    await vendorPage.clickVendorSearchResult('JFC');
+  });
 
-  // test('Edit vendor with EDI configuration', async () => {
-  //   await vendorPage.clickEditVendor();
-  //   await vendorPage.enterVendorAccountNumber('99999');
-  //   await vendorPage.selectEdiMode('EDI-first Processing');
-  //   await vendorPage.clickSave();
-  //   results['Local Vendor EDI Config'] = 'passed';
-  // });
+  test('Edit vendor with EDI configuration', async () => {
+    await vendorPage.clickEditVendor();
+    await vendorPage.enterVendorAccountNumber('99999');
+    await vendorPage.selectEdiMode('EDI-first Processing');
+    await vendorPage.clickSave();
+    results['Local Vendor EDI Config'] = 'passed';
+  });
 
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║                        Re-login as Developer                          ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- Re-login as Developer ---
 
   test('Logout as accountmanager', async () => {
     await loginPage.logout();
@@ -167,9 +163,7 @@ test.describe('EDI Invoices', () => {
     await loginPage.login('developer', config.credentials.password);
   });
 
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║                        Throw Mock Event                               ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- Throw Mock Event ---
 
   test('Navigate to Integrations', async () => {
     await integrationsPage.navigateToIntegrations();
@@ -182,30 +176,7 @@ test.describe('EDI Invoices', () => {
     await integrationsPage.clickSend();
   });
 
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║                    Vendor Item Packaging Ratio Fix                    ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
-
-  test('Navigate to Vendor Items', async () => {
-    await vendorItemPage.navigateViaLeftNav();
-  });
-
-  test('Search and open vendor item', async () => {
-    await vendorItemPage.searchVendorItem('AJINO FS SHRIMP SHUMAI 50PC 6/1.76 #');
-    await vendorItemPage.clickVendorItemSearchResult('AJINO FS SHRIMP SHUMAI 50PC 6/1.76 #');
-  });
-
-  test('Edit vendor item and fix packaging ratio', async () => {
-    await vendorItemPage.clickEditVendorItem();
-    const wasZero = await vendorItemPage.checkAndFixPackagingRatio('11');
-    if (wasZero) {
-      await vendorItemPage.scrollToBottomAndSave();
-    }
-  });
-
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║                        Re-login as Analyst2                           ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- Re-login as Analyst2 ---
 
   test('Logout as developer', async () => {
     await loginPage.logout();
@@ -215,9 +186,7 @@ test.describe('EDI Invoices', () => {
     await loginPage.login('analyst2', config.credentials.password);
   });
 
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║                          Reconciliation                               ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- Reconciliation ---
 
   test('Verify EDI invoice status is In Reconciliation', async () => {
     await orderPage.navigateToOrdersList();
@@ -233,6 +202,9 @@ test.describe('EDI Invoices', () => {
 
   test('Complete reconciliation', async () => {
     await orderPage.waitForPageLoad();
+    await orderPage.searchLineItem('Ajino');
+    await orderPage.clickEnvelopeIcon();
+    await orderPage.fixImportedLineItemRatio('11');
     await orderPage.scrollToHandwritingSection();
     await orderPage.setHandwritingToNo();
     await orderPage.markReconciliationComplete();
@@ -241,9 +213,7 @@ test.describe('EDI Invoices', () => {
     results['Reconciliation'] = 'passed';
   });
 
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║              Verify Status & Re-login for Next Review                 ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- Verify Status & Re-login for Next Review ---
 
   let invoiceStatus: 'final_review' | 'am_review' = 'final_review';
 
@@ -275,9 +245,7 @@ test.describe('EDI Invoices', () => {
     }
   });
 
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║                    Final Review (if applicable)                       ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- Final Review (if applicable) ---
 
   test('Start final review', async () => {
     test.skip(invoiceStatus !== 'final_review', 'Skipping — status is not Final Review');
@@ -291,5 +259,33 @@ test.describe('EDI Invoices', () => {
     await orderPage.saveAndCompleteFinalReview();
     await orderPage.clickVerifiedInModal();
     results['Final Review'] = 'passed';
+  });
+
+  // --- New Vendor Item Approval (if applicable) ---
+
+  test('Assign product to new vendor item', async () => {
+    test.skip(invoiceStatus !== 'am_review', 'Skipping — status is not AM Review');
+    await newVendorItemsTaskPage.navigateToNewVendorItems();
+    await newVendorItemsTaskPage.selectFirstRow();
+    await newVendorItemsTaskPage.clickAssignProduct();
+    await newVendorItemsTaskPage.assignNewProduct('Baked Goods', '1', 'Case', '1');
+    results['Assign New Vendor Item Product'] = 'passed';
+  });
+
+  test('Approve new vendor item', async () => {
+    test.skip(invoiceStatus !== 'am_review', 'Skipping — status is not AM Review');
+    await newVendorItemsTaskPage.selectFirstRowAndApprove();
+    results['Approve New Vendor Item'] = 'passed';
+  });
+
+  // --- Invoice Status Verification ---
+
+  test('Verify invoice status is Closed', async () => {
+    await orderPage.navigateToOrdersList();
+    await orderPage.searchOrderInList('IMPORTED2');
+    const isClosed = await orderPage.verifyInvoiceStatusClosed('IMPORTED2');
+    if (isClosed) {
+      results['Invoice Closed'] = 'passed';
+    }
   });
 });

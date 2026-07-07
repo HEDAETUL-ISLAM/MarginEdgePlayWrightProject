@@ -197,6 +197,37 @@ export class OrderPage extends BasePage {
     await totalInput.fill(amount);
   }
 
+  async searchLineItem(searchText: string) {
+    const searchInput = this.page.locator('input[ng-model="filterValue"][placeholder="Search"]');
+    await searchInput.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await searchInput.fill(searchText);
+    await this.page.waitForTimeout(2000);
+  }
+
+  async clickEnvelopeIcon() {
+    const envelopeButton = this.page.locator('span.glyphicon-envelope[title*="imported from email"]');
+    await envelopeButton.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await envelopeButton.click();
+    await this.page.waitForTimeout(1000);
+  }
+
+  async fixImportedLineItemRatio(ratioValue: string) {
+    const ratioInput = this.page.locator('input[ng-model="vpu.ratioDisplay"][ng-change="ratioChange(vpu)"]');
+    await ratioInput.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await ratioInput.clear();
+    await ratioInput.fill(ratioValue);
+    await this.page.waitForTimeout(500);
+
+    const saveButton = this.page.locator('button[ng-click="saveImportedReconcileLineItem()"]');
+    if (await this.isVisible(saveButton)) {
+      await saveButton.click();
+    } else {
+      const fallbackSave = this.page.locator('.modal.in button').filter({ hasText: /save/i });
+      await fallbackSave.click();
+    }
+    await this.page.waitForTimeout(1000);
+  }
+
   async scrollToHandwritingSection() {
     const handwritingSection = this.page.getByText(/handwriting and other adjustments/i).first();
     await handwritingSection.waitFor({ state: 'visible', timeout: TIMEOUT.default });
@@ -205,13 +236,16 @@ export class OrderPage extends BasePage {
   }
 
   async setHandwritingToNo() {
-    const handwritingSelect = this.page.locator('select[name="handwrittenMarkup"]');
+    await this.page.waitForLoadState('networkidle', { timeout: TIMEOUT.default }).catch(() => {});
+    await this.page.waitForTimeout(2000);
+    const handwritingSelect = this.page.locator('select[name="handwrittenMarkup"]').first();
     await handwritingSelect.waitFor({ state: 'visible', timeout: TIMEOUT.default });
     await handwritingSelect.scrollIntoViewIfNeeded();
     await this.page.waitForTimeout(500);
     // Set value via DOM and dispatch change event for AngularJS binding
     await this.page.evaluate(() => {
-      const select = document.querySelector('select[name="handwrittenMarkup"]') as HTMLSelectElement;
+      const selects = document.querySelectorAll('select[name="handwrittenMarkup"]');
+      const select = Array.from(selects).find(el => !el.closest('#ediConfirmHandwritingModal')) as HTMLSelectElement;
       select.value = 'boolean:false';
       select.dispatchEvent(new Event('change', { bubbles: true }));
     });

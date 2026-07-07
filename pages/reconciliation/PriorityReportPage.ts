@@ -1,4 +1,4 @@
-import { Page, Locator, BrowserContext } from '@playwright/test';
+import { Page, Locator } from '@playwright/test';
 import { BasePage, TIMEOUT } from '../BasePage';
 
 export class PriorityReportPage extends BasePage {
@@ -36,7 +36,6 @@ export class PriorityReportPage extends BasePage {
     await this.howManyModalOkButton.click();
     await this.waitForPageLoad();
     await this.page.waitForTimeout(3000);
-    await this.closePhotoViewerTab();
     // Wait for the order page to fully load (vendor dropdown signals readiness)
     const vendorDropdown = this.page.getByLabel('Select a vendor activate');
     await vendorDropdown.waitFor({ state: 'visible', timeout: TIMEOUT.extended });
@@ -50,7 +49,6 @@ export class PriorityReportPage extends BasePage {
     await this.howManyModalOkButton.click();
     await this.waitForPageLoad();
     await this.page.waitForTimeout(3000);
-    await this.closePhotoViewerTab();
   }
 
   async startFinalReview() {
@@ -60,17 +58,5 @@ export class PriorityReportPage extends BasePage {
     await this.howManyModalOkButton.click();
     await this.waitForPageLoad();
     await this.page.waitForTimeout(3000);
-    await this.closePhotoViewerTab();
-  }
-
-  private async closePhotoViewerTab() {
-    const context = this.page.context();
-    const pages = context.pages();
-    for (const p of pages) {
-      if (p !== this.page && p.url().includes('/photoViewer')) {
-        await p.close();
-      }
-    }
-    await this.page.bringToFront();
   }
 }
