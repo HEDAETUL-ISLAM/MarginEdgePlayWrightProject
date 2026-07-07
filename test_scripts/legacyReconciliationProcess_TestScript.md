@@ -70,14 +70,16 @@
 | 2.2 | Click **Setup** in the left navigation | Setup menu expands |
 | 2.3 | Click **Users** | Setup Users page loads |
 | 2.4 | Click the **Show** dropdown and select **MarginEdge Staff** | User list filters to MarginEdge staff members |
-| 2.5 | Search for **"Analyst"** | Analyst users appear in the list |
+| 2.5 | Search for **"the"** | The Analyst user appears in the list |
 | 2.6 | Double-click the **1st row** to open user details | User detail form opens |
 | 2.7 | In the **Office** dropdown, select **"Dhaka"** | Office is set to Dhaka |
 | 2.8 | Scroll to the bottom of the page and click **Save** | User record is saved |
-| 2.9 | Select **MarginEdge Staff** again, search **"Analyst"** | Analyst list reappears |
-| 2.10 | Double-click the **2nd row** | Second analyst's detail form opens |
+| 2.9 | Select **MarginEdge Staff** again, search **"second"** | Second Analyst appears in the list |
+| 2.10 | Double-click the **1st row** | Second analyst's detail form opens |
 | 2.11 | Select **"Dhaka"** as office and save | Second analyst's office is set |
-| 2.12 | Repeat for the **3rd row** | Third analyst's office is set to Dhaka |
+| 2.12 | Select **MarginEdge Staff** again, search **"lead"** | Lead analyst appears in the list |
+| 2.13 | Double-click the **1st row** | Lead analyst's detail form opens |
+| 2.14 | Select **"Dhaka"** as office and save | Lead analyst's office is set to Dhaka |
 
 ---
 
@@ -272,7 +274,7 @@ The automated test tracks the following stages. Each defaults to **failed** and 
 | 2 | Assign Lead Analyst to Second Analyst | passed |
 | 3 | Set Office for Analyst 1 | passed |
 | 4 | Set Office for Analyst 2 | passed |
-| 5 | Set Office for Analyst 3 | passed |
+| 5 | Set Office for Lead Analyst | passed |
 | 6 | Add Product | passed |
 | 7 | Add Vendor Item | passed |
 | 8 | File Uploaded | passed |
