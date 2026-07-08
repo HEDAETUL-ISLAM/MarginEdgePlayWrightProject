@@ -24,4 +24,7 @@ export const testNames = {
   recipe3: `Automated Recipe3 ${TEST_RUN_ID}`,
   countSheet3: `Automated Countsheet3 ${TEST_RUN_ID}`,
   tenant: `Automated Tenant ${TEST_RUN_ID}`,
+  recipeTypeMenu: `Menu Type ${TEST_RUN_ID}`,
+  recipeTypePrepared: `Prepared Type ${TEST_RUN_ID}`,
+  recipeTypeBar: `Bar Type ${TEST_RUN_ID}`,
 };

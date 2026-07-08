@@ -6,7 +6,7 @@
 | **Test Suite**     | Recipe Test Suite                                  |
 | **Spec File**      | `tests/recipes/recipeTestSuite.spec.ts`            |
 | **Execution Mode** | Serial                                             |
-| **Default Tenant** | Wasabi Tysons                                      |
+| **Tenant**         | Wasabi Tysons                                      |
 | **Environment**    | DEV (`https://me-63384.dev.marginedge.com`)        |
 
 ---
@@ -206,382 +206,396 @@
 
 ---
 
-### Stage 10: Complete Final Review
+### Stage 10: Verify Invoice Status After Reconciliation
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
 | 10.1 | Navigate to Orders page | Orders list loads |
-| 10.2 | Search for the invoice number and click the matching row | Order detail page opens |
-| 10.3 | Click the checkbox: **"This order has been reviewed and should be closed"** | Checkbox is checked |
-| 10.4 | Click **Save** | Order is saved |
-| 10.5 | Click the **Verified** button in the modal | Verification is confirmed; navigates back to orders list |
+| 10.2 | Search for the invoice number (from Stage 8) | Matching order row appears |
+| 10.3 | Check if the invoice status is **"In Processing"** or **"Closed"** | Status is determined |
+| 10.4 | Store the status to determine the next workflow path | If **In Processing** → proceed to Final Review; if **Closed** → skip Final Review |
 
 ---
 
-### Stage 11: Edit Product
+### Stage 11: Complete Final Review (Conditional)
+
+> **Skipped if invoice status is "Closed"**
+> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
+
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 11.1 | Navigate to Orders page | Orders list loads |
+| 11.2 | Search for the invoice number and click the matching row | Order detail page opens |
+| 11.3 | Click the checkbox: **"This order has been reviewed and should be closed"** | Checkbox is checked |
+| 11.4 | Click **Save** | Order is saved |
+| 11.5 | Click the **Verified** button in the modal | Verification is confirmed; navigates back to orders list |
+
+---
+
+### Stage 12: Edit Product
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 11.1 | Navigate to Products via left nav | Products list loads |
-| 11.2 | Verify the Products page is loaded | Page is ready |
-| 11.3 | Search for the product name (from Stage 1) | Product row appears |
-| 11.4 | Click on the product row | Product detail page opens |
-| 11.5 | Click **Edit Product** | Edit form opens |
-| 11.6 | Scroll to the bottom and click **Save** | Product is saved (triggers recipe cost recalculation) |
-| 11.7 | If an **"Affected Recipes"** modal appears: click the **Submit** button | Modal is handled |
+| 12.1 | Navigate to Products via left nav | Products list loads |
+| 12.2 | Verify the Products page is loaded | Page is ready |
+| 12.3 | Search for the product name (from Stage 1) | Product row appears |
+| 12.4 | Click on the product row | Product detail page opens |
+| 12.5 | Click **Edit Product** | Edit form opens |
+| 12.6 | Scroll to the bottom and click **Save** | Product is saved (triggers recipe cost recalculation) |
+| 12.7 | If an **"Affected Recipes"** modal appears: click the **Submit** button | Modal is handled |
 
 ---
 
-### Stage 12: Verify Recipe Cost After Order Close
+### Stage 13: Verify Recipe Cost After Order Close
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 12.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
-| 12.2 | Verify the page is loaded | Page is ready |
-| 12.3 | Locate the row for `Automated Recipe <RUN_ID>` and read the cost column | Cost value is retrieved |
-| 12.4 | If the cost does not contain **"80"**: wait 15 seconds and retry (up to 5 attempts) | Server-side cost calculation may be delayed |
-| 12.5 | Verify the cost contains **"80"** | Recipe cost reflects the $80 unit price from the closed invoice |
+| 13.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
+| 13.2 | Verify the page is loaded | Page is ready |
+| 13.3 | Locate the row for `Automated Recipe <RUN_ID>` and read the cost column | Cost value is retrieved |
+| 13.4 | If the cost does not contain **"80"**: wait 15 seconds and retry (up to 5 attempts) | Server-side cost calculation may be delayed |
+| 13.5 | Verify the cost contains **"80"** | Recipe cost reflects the $80 unit price from the closed invoice |
 
 > **Note:** The server may take time to update the cost after the order is closed. The test retries up to 5 times with 15-second intervals.
 
 ---
 
-### Stage 13: Create Count Sheet 1
+### Stage 14: Create Count Sheet
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 13.1 | Navigate to Inventory Setup page (`/#/inventorySetup`) | Inventory Setup page loads |
-| 13.2 | Click **Add Count Sheet** | Count sheet creation form opens |
-| 13.3 | Enter the count sheet name `Automated Countsheet <RUN_ID>` | Name is filled |
-| 13.4 | Click **Add Recipe** | Add Recipe modal opens |
-| 13.5 | Click the recipe dropdown, type `Automated Recipe <RUN_ID>`, and select the matching option | Recipe is selected |
-| 13.6 | Click **Add Recipe** button inside the modal | Recipe is added to the count sheet |
-| 13.7 | Scroll to the bottom and click **Save** | Count sheet is saved |
-| 13.8 | Navigate to Inventory page, click the **Enter a Count** dropdown, and verify the count sheet name appears | Count sheet was created successfully |
+| 14.1 | Navigate to Inventory Setup page (`/#/inventorySetup`) | Inventory Setup page loads |
+| 14.2 | Click **Add Count Sheet** | Count sheet creation form opens |
+| 14.3 | Enter the count sheet name `Automated Countsheet <RUN_ID>` | Name is filled |
+| 14.4 | Click **Add Recipe** | Add Recipe modal opens |
+| 14.5 | Click the recipe dropdown, type `Automated Recipe <RUN_ID>`, and select the matching option | Recipe is selected |
+| 14.6 | Click **Add Recipe** button inside the modal | Recipe is added to the count sheet |
+| 14.7 | Scroll to the bottom and click **Save** | Count sheet is saved |
+| 14.8 | Navigate to Inventory page, click the **Enter a Count** dropdown, and verify the count sheet name appears | Count sheet was created successfully |
 
 ---
 
-### Stage 14: Close Inventory Count
+### Stage 15: Close Inventory Count
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 14.1 | Navigate to Inventory Counts page (`/#/inventory`) | Inventory Counts page loads |
-| 14.2 | Click the **My Store** tab | My Store inventory view loads |
-| 14.3 | Click the **Enter a Count** dropdown and select the count sheet `Automated Countsheet <RUN_ID>` | Count entry form opens |
-| 14.4 | Click the inventory date field and set it to today | Date is set |
-| 14.5 | Find the count input for `Automated Recipe <RUN_ID>` (via `data-testid="invCount-<recipe_name>"`) and enter **5** | Count is entered |
-| 14.6 | Click **Save Options** dropdown, then click **Save and Close** | Inventory is saved and closed |
-| 14.7 | Click **OK** in the confirmation dialog | Close is confirmed |
-| 14.8 | Navigate back to Inventory Counts page and verify the count sheet name appears in the list | Inventory is closed successfully |
+| 15.1 | Navigate to Inventory Counts page (`/#/inventory`) | Inventory Counts page loads |
+| 15.2 | Click the **My Store** tab | My Store inventory view loads |
+| 15.3 | Click the **Enter a Count** dropdown and select the count sheet `Automated Countsheet <RUN_ID>` | Count entry form opens |
+| 15.4 | Click the inventory date field and set it to today | Date is set |
+| 15.5 | Find the count input for `Automated Recipe <RUN_ID>` (via `data-testid="invCount-<recipe_name>"`) and enter **5** | Count is entered |
+| 15.6 | Click **Save Options** dropdown, then click **Save and Close** | Inventory is saved and closed |
+| 15.7 | Click **OK** in the confirmation dialog | Close is confirmed |
+| 15.8 | Navigate back to Inventory Counts page and verify the count sheet name appears in the list | Inventory is closed successfully |
 
 ---
 
-### Stage 15: Update Count Sheet - Remove Recipe
+### Stage 16: Update Count Sheet - Remove Recipe
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 15.1 | Navigate to Inventory Setup page | Inventory Setup loads |
-| 15.2 | Click on the count sheet `Automated Countsheet <RUN_ID>` | Count sheet detail opens |
-| 15.3 | Scroll to the bottom and click the **delete** button for the recipe (via `data-testid="itemDeleteCS-<recipe_name>"`) | Confirmation dialog may appear |
-| 15.4 | If a confirmation dialog appears, click **OK** | Recipe deletion is confirmed |
-| 15.5 | Scroll to the bottom and click **Save** | Count sheet is saved |
-| 15.6 | Verify the recipe's delete button is no longer visible | Recipe was successfully removed from the count sheet |
+| 16.1 | Navigate to Inventory Setup page | Inventory Setup loads |
+| 16.2 | Click on the count sheet `Automated Countsheet <RUN_ID>` | Count sheet detail opens |
+| 16.3 | Scroll to the bottom and click the **delete** button for the recipe (via `data-testid="itemDeleteCS-<recipe_name>"`) | Confirmation dialog may appear |
+| 16.4 | If a confirmation dialog appears, click **OK** | Recipe deletion is confirmed |
+| 16.5 | Scroll to the bottom and click **Save** | Count sheet is saved |
+| 16.6 | Verify the recipe's delete button is no longer visible | Recipe was successfully removed from the count sheet |
 
 ---
 
-### Stage 16: Reopen Closed Inventory
+### Stage 17: Reopen Closed Inventory
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 16.1 | Navigate to Inventory Counts page | Inventory Counts loads |
-| 16.2 | Click the **My Store** tab | My Store view loads |
-| 16.3 | Click on the closed inventory row for `Automated Countsheet <RUN_ID>` | Inventory detail opens |
-| 16.4 | Click **Reopen** | Confirmation dialog appears |
-| 16.5 | Click **OK/Confirm/Yes** | Inventory is reopened |
-| 16.6 | Navigate back to Inventory Counts, click **My Store** tab, and verify the count sheet row shows status **"Saved"** | Inventory was successfully reopened |
+| 17.1 | Navigate to Inventory Counts page | Inventory Counts loads |
+| 17.2 | Click the **My Store** tab | My Store view loads |
+| 17.3 | Click on the closed inventory row for `Automated Countsheet <RUN_ID>` | Inventory detail opens |
+| 17.4 | Click **Reopen** | Confirmation dialog appears |
+| 17.5 | Click **OK/Confirm/Yes** | Inventory is reopened |
+| 17.6 | Navigate back to Inventory Counts, click **My Store** tab, and verify the count sheet row shows status **"Saved"** | Inventory was successfully reopened |
 
 ---
 
-### Stage 17: Deactivate Recipe
+### Stage 18: Deactivate Recipe
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 17.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
-| 17.2 | Click on the menu item `Automated Recipe <RUN_ID>` | Recipe detail page opens |
-| 17.3 | Click the **activation toggle** (`data-testid="activationButton"`) | Recipe is toggled off |
-| 17.4 | If a **"Recipe In Use"** modal appears: dismiss it | Modal indicates the recipe is still referenced; deactivation may be blocked |
-| 17.5 | If no modal appears: recipe is deactivated | Recipe is successfully deactivated |
+| 18.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
+| 18.2 | Click on the menu item `Automated Recipe <RUN_ID>` | Recipe detail page opens |
+| 18.3 | Click the **activation toggle** (`data-testid="activationButton"`) | Recipe is toggled off |
+| 18.4 | If a **"Recipe In Use"** modal appears: dismiss it | Modal indicates the recipe is still referenced; deactivation may be blocked |
+| 18.5 | If no modal appears: recipe is deactivated | Recipe is successfully deactivated |
 
 ---
 
-### Stage 18: Delete Saved Inventory
+### Stage 19: Delete Saved Inventory
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 18.1 | Navigate to Inventory Counts page | Inventory Counts loads |
-| 18.2 | Click the **My Store** tab | My Store view loads |
-| 18.3 | Click on the saved inventory row for `Automated Countsheet <RUN_ID>` | Inventory detail opens |
-| 18.4 | Click **Edit** | Edit mode is enabled |
-| 18.5 | Click the red **Delete** button (bottom-right) | Delete confirmation modal appears |
-| 18.6 | Click the **Delete** button inside the confirmation modal (`#deleteInventoryConfirmation`) | Inventory is deleted |
-| 18.7 | Navigate back to Inventory Counts, click **My Store** tab, and verify the count sheet row is no longer visible | Inventory was successfully deleted |
+| 19.1 | Navigate to Inventory Counts page | Inventory Counts loads |
+| 19.2 | Click the **My Store** tab | My Store view loads |
+| 19.3 | Click on the saved inventory row for `Automated Countsheet <RUN_ID>` | Inventory detail opens |
+| 19.4 | Click **Edit** | Edit mode is enabled |
+| 19.5 | Click the red **Delete** button (bottom-right) | Delete confirmation modal appears |
+| 19.6 | Click the **Delete** button inside the confirmation modal (`#deleteInventoryConfirmation`) | Inventory is deleted |
+| 19.7 | Navigate back to Inventory Counts, click **My Store** tab, and verify the count sheet row is no longer visible | Inventory was successfully deleted |
 
 ---
 
-### Stage 19: Deactivate Recipe After Inventory Delete
+### Stage 20: Deactivate Recipe After Inventory Delete
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 19.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
-| 19.2 | Click on the menu item `Automated Recipe <RUN_ID>` | Recipe detail page opens |
-| 19.3 | Click the **activation toggle** | Recipe toggles off |
-| 19.4 | Verify the toggle returns **"deactivated"** (no "Recipe In Use" modal appears) | Recipe is no longer referenced by any inventory |
-| 19.5 | Verify the **"Recipe Is Disabled"** banner is visible | Recipe is confirmed disabled |
+| 20.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
+| 20.2 | Click on the menu item `Automated Recipe <RUN_ID>` | Recipe detail page opens |
+| 20.3 | Click the **activation toggle** | Recipe toggles off |
+| 20.4 | Verify the toggle returns **"deactivated"** (no "Recipe In Use" modal appears) | Recipe is no longer referenced by any inventory |
+| 20.5 | Verify the **"Recipe Is Disabled"** banner is visible | Recipe is confirmed disabled |
 
 ---
 
-### Stage 20: Add Product 2
+### Stage 21: Add Product 2
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 20.1 | Navigate to Products via left nav | Products list loads |
-| 20.2 | Click **Add Product** | Add Product form opens |
-| 20.3 | Enter product name `Automated Product2 <RUN_ID>` | Name is filled |
-| 20.4 | Select category **"Cleaning Supplies"** | Category is set |
-| 20.5 | Select unit **"Case"** | Unit is set |
-| 20.6 | Click **Save** | Product is saved |
-| 20.7 | Verify the product appears in the **All stores** tab | Product 2 is created |
+| 21.1 | Navigate to Products via left nav | Products list loads |
+| 21.2 | Click **Add Product** | Add Product form opens |
+| 21.3 | Enter product name `Automated Product2 <RUN_ID>` | Name is filled |
+| 21.4 | Select category **"Cleaning Supplies"** | Category is set |
+| 21.5 | Select unit **"Case"** | Unit is set |
+| 21.6 | Click **Save** | Product is saved |
+| 21.7 | Verify the product appears in the **All stores** tab | Product 2 is created |
 
 ---
 
-### Stage 21: Add Menu Item 2 (Recipe 2) with Ingredient
+### Stage 22: Add Menu Item 2 (Recipe 2) with Ingredient
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 21.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
-| 21.2 | Click **Add Menu Item** | Add form opens |
-| 21.3 | Fill details: Name = `Automated Recipe2 <RUN_ID>`, Type = **test**, Quantity = **1**, Unit = **case** | Fields are filled |
-| 21.4 | Add ingredient: search and select `Automated Product2 <RUN_ID>`, Quantity = **1**, Unit = **case** | Ingredient is added |
-| 21.5 | Handle conversion modal if it appears (enter **1**, select unit, save) | Conversion is handled |
-| 21.6 | Click **Save** | Menu item is saved |
-| 21.7 | Verify redirect to Menu Items list | Menu item 2 is created |
+| 22.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
+| 22.2 | Click **Add Menu Item** | Add form opens |
+| 22.3 | Fill details: Name = `Automated Recipe2 <RUN_ID>`, Type = **test**, Quantity = **1**, Unit = **case** | Fields are filled |
+| 22.4 | Add ingredient: search and select `Automated Product2 <RUN_ID>`, Quantity = **1**, Unit = **case** | Ingredient is added |
+| 22.5 | Handle conversion modal if it appears (enter **1**, select unit, save) | Conversion is handled |
+| 22.6 | Click **Save** | Menu item is saved |
+| 22.7 | Verify redirect to Menu Items list | Menu item 2 is created |
 
 ---
 
-### Stage 22: Create Count Sheet 2
+### Stage 23: Create Count Sheet 2
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 22.1 | Navigate to Inventory Setup page | Inventory Setup loads |
-| 22.2 | Click **Add Count Sheet** | Count sheet form opens |
-| 22.3 | Enter count sheet name `Automated Countsheet2 <RUN_ID>` | Name is filled |
-| 22.4 | Click **Add Recipe**, search and select `Automated Recipe2 <RUN_ID>`, click **Add Recipe** in modal | Recipe is added |
-| 22.5 | Scroll to the bottom and click **Save** | Count sheet is saved |
-| 22.6 | Verify the count sheet appears in the **Enter a Count** dropdown on the Inventory page | Count sheet 2 is created |
+| 23.1 | Navigate to Inventory Setup page | Inventory Setup loads |
+| 23.2 | Click **Add Count Sheet** | Count sheet form opens |
+| 23.3 | Enter count sheet name `Automated Countsheet2 <RUN_ID>` | Name is filled |
+| 23.4 | Click **Add Recipe**, search and select `Automated Recipe2 <RUN_ID>`, click **Add Recipe** in modal | Recipe is added |
+| 23.5 | Scroll to the bottom and click **Save** | Count sheet is saved |
+| 23.6 | Verify the count sheet appears in the **Enter a Count** dropdown on the Inventory page | Count sheet 2 is created |
 
 ---
 
-### Stage 23: Save and Exit Inventory Count 2
+### Stage 24: Save and Exit Inventory Count 2
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 23.1 | Navigate to Inventory Counts page | Inventory Counts loads |
-| 23.2 | Click the **My Store** tab | My Store view loads |
-| 23.3 | Click the **Enter a Count** dropdown and select `Automated Countsheet2 <RUN_ID>` | Count entry form opens |
-| 23.4 | Set the inventory date to today | Date is set |
-| 23.5 | Enter **5** in the count input for `Automated Recipe2 <RUN_ID>` | Count is entered |
-| 23.6 | Click **Save Options** dropdown, then click **Save and Exit** | Inventory is saved (not closed) |
-| 23.7 | Navigate back to Inventory Counts, click **My Store** tab, and verify the row shows status **"Saved"** | Inventory is saved but remains open |
+| 24.1 | Navigate to Inventory Counts page | Inventory Counts loads |
+| 24.2 | Click the **My Store** tab | My Store view loads |
+| 24.3 | Click the **Enter a Count** dropdown and select `Automated Countsheet2 <RUN_ID>` | Count entry form opens |
+| 24.4 | Set the inventory date to today | Date is set |
+| 24.5 | Enter **5** in the count input for `Automated Recipe2 <RUN_ID>` | Count is entered |
+| 24.6 | Click **Save Options** dropdown, then click **Save and Exit** | Inventory is saved (not closed) |
+| 24.7 | Navigate back to Inventory Counts, click **My Store** tab, and verify the row shows status **"Saved"** | Inventory is saved but remains open |
 
 ---
 
-### Stage 24: Switch Tenant to Wasabi Natick
+### Stage 25: Switch Tenant to Wasabi Natick
 
 > **Logged in as:** `accountmanager`
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 24.1 | Click the **tenant dropdown** (`#unitMenu_dd`) | Tenant menu opens |
-| 24.2 | Select **"Wasabi Natick"** from the menu | Tenant switches; page reloads in Wasabi Natick context |
+| 25.1 | Click the **tenant dropdown** (`#unitMenu_dd`) | Tenant menu opens |
+| 25.2 | Select **"Wasabi Natick"** from the menu | Tenant switches; page reloads in Wasabi Natick context |
 
 ---
 
-### Stage 25: Verify Recipe In Use Cannot Be Deactivated (Same Company)
+### Stage 26: Verify Recipe In Use Cannot Be Deactivated (Same Company)
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Natick
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 25.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
-| 25.2 | Click on the menu item `Automated Recipe2 <RUN_ID>` | Recipe detail page opens |
-| 25.3 | Click the **activation toggle** | **"Recipe In Use"** modal appears |
-| 25.4 | Verify the toggle returns **"in_use"** | Recipe cannot be deactivated because it's used in an active inventory at another tenant (Wasabi Tysons) under the same company concept |
-| 25.5 | Dismiss the modal (click button or press Escape) | Modal closes |
+| 26.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
+| 26.2 | Click on the menu item `Automated Recipe2 <RUN_ID>` | Recipe detail page opens |
+| 26.3 | Click the **activation toggle** | **"Recipe In Use"** modal appears |
+| 26.4 | Verify the toggle returns **"in_use"** | Recipe cannot be deactivated because it's used in an active inventory at another tenant (Wasabi Tysons) under the same company concept |
+| 26.5 | Dismiss the modal (click button or press Escape) | Modal closes |
 
 ---
 
-### Stage 26: Switch Tenant Back to Wasabi Tysons
+### Stage 27: Switch Tenant Back to Wasabi Tysons
 
 > **Logged in as:** `accountmanager`
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 26.1 | Click the **tenant dropdown** | Tenant menu opens |
-| 26.2 | Select **"Wasabi Tysons"** from the menu | Tenant switches back |
+| 27.1 | Click the **tenant dropdown** | Tenant menu opens |
+| 27.2 | Select **"Wasabi Tysons"** from the menu | Tenant switches back |
 
 ---
 
-### Stage 27: Add New Tenant (Cross-Company)
+### Stage 28: Add New Tenant (Cross-Company)
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 27.1 | Navigate to base URL | Home page loads |
-| 27.2 | Click **Central** in the left navigation | Central menu expands |
-| 27.3 | Click **Restaurant Units** | Restaurant Units list page loads |
-| 27.4 | Verify the URL contains `/restaurantUnit` | Page is confirmed loaded |
-| 27.5 | Click **Bulk Add Restaurant** | Bulk add form opens |
-| 27.6 | Click **"Can't find your company?"** link | Advanced company selection form loads |
-| 27.7 | In the **Concept** dropdown, search and select **"Wasabi"** | Concept is set |
-| 27.8 | In the **Company** dropdown, search and select **"Mid-States Management Group"** | Company is set (different company, same concept) |
-| 27.9 | Check the **Cross Unit Reporting** checkbox (if not already checked) | Cross-unit reporting is enabled |
-| 27.10 | Enter the restaurant unit name `Automated Tenant <RUN_ID>` | Name is filled |
-| 27.11 | In the **State** dropdown, search and select **"Alabama"** | State is set |
-| 27.12 | Enter zip code **12345** | Zip code is filled |
-| 27.13 | In the **POS** dropdown, select **"-- None --"** | POS is set |
-| 27.14 | In the **Accounting** dropdown, select **"-- None --"** | Accounting is set |
-| 27.15 | Enter **12** in the **Subscription** field | Subscription value is set |
-| 27.16 | Scroll to the bottom and click **Save** | Confirmation modal appears |
-| 27.17 | Click **Save** in the confirmation modal | Tenant is created |
-| 27.18 | Verify the page redirects away from `/restaurantUnit/bulkAdd` back to `/restaurantUnit` | Tenant creation is confirmed |
+| 28.1 | Navigate to base URL | Home page loads |
+| 28.2 | Click **Central** in the left navigation | Central menu expands |
+| 28.3 | Click **Restaurant Units** | Restaurant Units list page loads |
+| 28.4 | Verify the URL contains `/restaurantUnit` | Page is confirmed loaded |
+| 28.5 | Click **Bulk Add Restaurant** | Bulk add form opens |
+| 28.6 | Click **"Can't find your company?"** link | Advanced company selection form loads |
+| 28.7 | In the **Concept** dropdown, search and select **"Wasabi"** | Concept is set |
+| 28.8 | In the **Company** dropdown, search and select **"Mid-States Management Group"** | Company is set (different company, same concept) |
+| 28.9 | Check the **Cross Unit Reporting** checkbox (if not already checked) | Cross-unit reporting is enabled |
+| 28.10 | Enter the restaurant unit name `Automated Tenant <RUN_ID>` | Name is filled |
+| 28.11 | In the **State** dropdown, search and select **"Alabama"** | State is set |
+| 28.12 | Enter zip code **12345** | Zip code is filled |
+| 28.13 | In the **POS** dropdown, select **"-- None --"** | POS is set |
+| 28.14 | In the **Accounting** dropdown, select **"-- None --"** | Accounting is set |
+| 28.15 | Enter **12** in the **Subscription** field | Subscription value is set |
+| 28.16 | Scroll to the bottom and click **Save** | Confirmation modal appears |
+| 28.17 | Click **Save** in the confirmation modal | Tenant is created |
+| 28.18 | Verify the page redirects away from `/restaurantUnit/bulkAdd` back to `/restaurantUnit` | Tenant creation is confirmed |
 
 ---
 
-### Stage 28: Add Product 3
+### Stage 29: Add Product 3
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 28.1 | Navigate to Products via left nav | Products list loads |
-| 28.2 | Click **Add Product** | Add Product form opens |
-| 28.3 | Enter product name `Automated Product3 <RUN_ID>` | Name is filled |
-| 28.4 | Select category **"Cleaning Supplies"** | Category is set |
-| 28.5 | Select unit **"Case"** | Unit is set |
-| 28.6 | Click **Save** | Product is saved |
-| 28.7 | Verify the product appears in the **All stores** tab | Product 3 is created |
+| 29.1 | Navigate to Products via left nav | Products list loads |
+| 29.2 | Click **Add Product** | Add Product form opens |
+| 29.3 | Enter product name `Automated Product3 <RUN_ID>` | Name is filled |
+| 29.4 | Select category **"Cleaning Supplies"** | Category is set |
+| 29.5 | Select unit **"Case"** | Unit is set |
+| 29.6 | Click **Save** | Product is saved |
+| 29.7 | Verify the product appears in the **All stores** tab | Product 3 is created |
 
 ---
 
-### Stage 29: Add Menu Item 3 (Recipe 3) with Ingredient
+### Stage 30: Add Menu Item 3 (Recipe 3) with Ingredient
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 29.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
-| 29.2 | Click **Add Menu Item** | Add form opens |
-| 29.3 | Fill details: Name = `Automated Recipe3 <RUN_ID>`, Type = **test**, Quantity = **1**, Unit = **case** | Fields are filled |
-| 29.4 | Add ingredient: search and select `Automated Product3 <RUN_ID>`, Quantity = **1**, Unit = **case** | Ingredient is added |
-| 29.5 | Handle conversion modal if it appears | Conversion is handled |
-| 29.6 | Click **Save** | Menu item is saved |
-| 29.7 | Verify redirect to Menu Items list | Menu item 3 is created |
+| 30.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
+| 30.2 | Click **Add Menu Item** | Add form opens |
+| 30.3 | Fill details: Name = `Automated Recipe3 <RUN_ID>`, Type = **test**, Quantity = **1**, Unit = **case** | Fields are filled |
+| 30.4 | Add ingredient: search and select `Automated Product3 <RUN_ID>`, Quantity = **1**, Unit = **case** | Ingredient is added |
+| 30.5 | Handle conversion modal if it appears | Conversion is handled |
+| 30.6 | Click **Save** | Menu item is saved |
+| 30.7 | Verify redirect to Menu Items list | Menu item 3 is created |
 
 ---
 
-### Stage 30: Create Count Sheet 3
+### Stage 31: Create Count Sheet 3
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 30.1 | Navigate to Inventory Setup page | Inventory Setup loads |
-| 30.2 | Click **Add Count Sheet** | Count sheet form opens |
-| 30.3 | Enter count sheet name `Automated Countsheet3 <RUN_ID>` | Name is filled |
-| 30.4 | Click **Add Recipe**, search and select `Automated Recipe3 <RUN_ID>`, click **Add Recipe** in modal | Recipe is added |
-| 30.5 | Scroll to the bottom and click **Save** | Count sheet is saved |
-| 30.6 | Verify the count sheet appears in the **Enter a Count** dropdown on the Inventory page | Count sheet 3 is created |
+| 31.1 | Navigate to Inventory Setup page | Inventory Setup loads |
+| 31.2 | Click **Add Count Sheet** | Count sheet form opens |
+| 31.3 | Enter count sheet name `Automated Countsheet3 <RUN_ID>` | Name is filled |
+| 31.4 | Click **Add Recipe**, search and select `Automated Recipe3 <RUN_ID>`, click **Add Recipe** in modal | Recipe is added |
+| 31.5 | Scroll to the bottom and click **Save** | Count sheet is saved |
+| 31.6 | Verify the count sheet appears in the **Enter a Count** dropdown on the Inventory page | Count sheet 3 is created |
 
 ---
 
-### Stage 31: Save and Exit Inventory Count 3
+### Stage 32: Save and Exit Inventory Count 3
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 31.1 | Navigate to Inventory Counts page | Inventory Counts loads |
-| 31.2 | Click the **My Store** tab | My Store view loads |
-| 31.3 | Click the **Enter a Count** dropdown and select `Automated Countsheet3 <RUN_ID>` | Count entry form opens |
-| 31.4 | Set the inventory date to today | Date is set |
-| 31.5 | Enter **5** in the count input for `Automated Recipe3 <RUN_ID>` | Count is entered |
-| 31.6 | Click **Save Options** dropdown, then click **Save and Exit** | Inventory is saved (not closed) |
-| 31.7 | Navigate back and verify the row shows status **"Saved"** | Inventory is saved |
+| 32.1 | Navigate to Inventory Counts page | Inventory Counts loads |
+| 32.2 | Click the **My Store** tab | My Store view loads |
+| 32.3 | Click the **Enter a Count** dropdown and select `Automated Countsheet3 <RUN_ID>` | Count entry form opens |
+| 32.4 | Set the inventory date to today | Date is set |
+| 32.5 | Enter **5** in the count input for `Automated Recipe3 <RUN_ID>` | Count is entered |
+| 32.6 | Click **Save Options** dropdown, then click **Save and Exit** | Inventory is saved (not closed) |
+| 32.7 | Navigate back and verify the row shows status **"Saved"** | Inventory is saved |
 
 ---
 
-### Stage 32: Switch Tenant to New Tenant
+### Stage 33: Switch Tenant to New Tenant
 
 > **Logged in as:** `accountmanager`
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 32.1 | Click the **tenant dropdown** | Tenant menu opens |
-| 32.2 | Select `Automated Tenant <RUN_ID>` from the menu | Tenant switches to the newly created tenant |
+| 33.1 | Click the **tenant dropdown** | Tenant menu opens |
+| 33.2 | Select `Automated Tenant <RUN_ID>` from the menu | Tenant switches to the newly created tenant |
 
 ---
 
-### Stage 33: Verify Recipe In Use Cannot Be Deactivated (Cross-Company)
+### Stage 34: Verify Recipe In Use Cannot Be Deactivated (Cross-Company)
 
 > **Logged in as:** `accountmanager` | **Tenant:** `Automated Tenant <RUN_ID>`
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 33.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
-| 33.2 | Click on the menu item `Automated Recipe3 <RUN_ID>` | Recipe detail page opens |
-| 33.3 | Click the **activation toggle** | **"Recipe In Use"** modal appears |
-| 33.4 | Verify the toggle returns **"in_use"** | Recipe cannot be deactivated because it's used in an active inventory at Wasabi Tysons under a different company but the same concept |
-| 33.5 | Dismiss the modal | Modal closes |
+| 34.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
+| 34.2 | Click on the menu item `Automated Recipe3 <RUN_ID>` | Recipe detail page opens |
+| 34.3 | Click the **activation toggle** | **"Recipe In Use"** modal appears |
+| 34.4 | Verify the toggle returns **"in_use"** | Recipe cannot be deactivated because it's used in an active inventory at Wasabi Tysons under a different company but the same concept |
+| 34.5 | Dismiss the modal | Modal closes |
 
 ---
 
-### Stage 34: Switch Tenant Back to Wasabi Tysons
+### Stage 35: Switch Tenant Back to Wasabi Tysons
 
 > **Logged in as:** `accountmanager`
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 34.1 | Click the **tenant dropdown** | Tenant menu opens |
-| 34.2 | Select **"Wasabi Tysons"** from the menu | Tenant switches back to the default |
+| 35.1 | Click the **tenant dropdown** | Tenant menu opens |
+| 35.2 | Select **"Wasabi Tysons"** from the menu | Tenant switches back to the default |
 
 ---
 
@@ -599,7 +613,7 @@ The automated test tracks the following stages. Each defaults to **failed** and 
 | 6 | End Preprocessing | pending |
 | 7 | Initial Review | pending |
 | 8 | Reconciliation | pending |
-| 9 | Final Review | pending |
+| 9 | Final Review | pending (conditional — skipped if invoice is already Closed) |
 | 10 | Edit Product | pending |
 | 11 | Verify Recipe Cost | pending |
 | 12 | Create Count Sheet | pending |
@@ -630,57 +644,36 @@ The automated test tracks the following stages. Each defaults to **failed** and 
 ## Workflow Overview
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                   RECIPE LIFECYCLE (Stages 1-12)                │
-│                                                                 │
-│  Product ──> Vendor Item ──> Menu Item ──> Add Ingredient       │
-│       │                                                         │
-│       └──> Invoice Upload ──> Preprocessing ──> Initial Review  │
-│                 ──> Reconciliation ──> Final Review              │
-│                        │                                        │
-│                        └──> Edit Product ──> Verify Recipe Cost  │
-└─────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│            INVENTORY LIFECYCLE (Stages 13-19)                   │
-│                                                                 │
-│  Create Count Sheet ──> Close Inventory ──> Update Count Sheet  │
-│       ──> Reopen Inventory ──> Deactivate Recipe                │
-│       ──> Delete Inventory ──> Deactivate Recipe (succeeds)     │
-└─────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│        SAME COMPANY CONCEPT CHECK (Stages 20-26)                │
-│                                                                 │
-│  Product 2 ──> Recipe 2 ──> Count Sheet 2 ──> Save Inventory   │
-│       ──> Switch to Wasabi Natick                               │
-│       ──> Try Deactivate Recipe 2 ──> BLOCKED (in_use)          │
-│       ──> Switch Back to Wasabi Tysons                          │
-└─────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│       CROSS COMPANY CONCEPT CHECK (Stages 27-34)                │
-│                                                                 │
-│  Add New Tenant (different company, same concept)               │
-│       ──> Product 3 ──> Recipe 3 ──> Count Sheet 3              │
-│       ──> Save Inventory                                        │
-│       ──> Switch to New Tenant                                  │
-│       ──> Try Deactivate Recipe 3 ──> BLOCKED (in_use)          │
-│       ──> Switch Back to Wasabi Tysons                          │
-└─────────────────────────────────────────────────────────────────┘
+accountmanager ──> Products, Vendor Items, Menu Items, Invoice Processing,
+                   Inventory Management, Tenant Management
+       │
+       ├──> Recipe Lifecycle (Stages 1-13)
+       │       Product ──> Vendor Item ──> Menu Item ──> Add Ingredient
+       │       ──> Invoice Upload ──> Preprocessing ──> Initial Review
+       │       ──> Reconciliation ──> Verify Status
+       │           ├── In Processing ──> Final Review
+       │           └── Closed ──> (skip Final Review)
+       │       ──> Edit Product ──> Verify Recipe Cost
+       │
+       ├──> Inventory Lifecycle (Stages 14-20)
+       │       Create Count Sheet ──> Close Inventory ──> Update Count Sheet
+       │       ──> Reopen Inventory ──> Deactivate Recipe
+       │       ──> Delete Inventory ──> Deactivate Recipe (succeeds)
+       │
+       ├──> Same Company Concept Check (Stages 21-27)
+       │       Product 2 ──> Recipe 2 ──> Count Sheet 2 ──> Save Inventory
+       │       ──> Switch to Wasabi Natick
+       │       ──> Try Deactivate Recipe 2 ──> BLOCKED (in_use)
+       │       ──> Switch Back to Wasabi Tysons
+       │
+       └──> Cross Company Concept Check (Stages 28-35)
+               Add New Tenant (different company, same concept)
+               ──> Product 3 ──> Recipe 3 ──> Count Sheet 3
+               ──> Save Inventory
+               ──> Switch to New Tenant
+               ──> Try Deactivate Recipe 3 ──> BLOCKED (in_use)
+               ──> Switch Back to Wasabi Tysons
 ```
-
----
-
-## Key Verification Points
-
-| Scenario | Expected Behavior |
-|----------|-------------------|
-| Recipe cost after invoice close | Cost updates to reflect the vendor item unit price ($80) |
-| Deactivate recipe with active inventory | Blocked with "Recipe In Use" modal |
-| Deactivate recipe after inventory deleted | Succeeds; "Recipe Is Disabled" banner appears |
-| Deactivate recipe from same-concept tenant (same company) | Blocked — inventory exists at Wasabi Tysons |
-| Deactivate recipe from same-concept tenant (different company) | Blocked — cross-company concept protection applies |
 
 ---
 
@@ -690,5 +683,6 @@ The automated test tracks the following stages. Each defaults to **failed** and 
 - The entire suite runs under a single `accountmanager` session (no user switching required, unlike the Legacy Reconciliation Process).
 - The `createResultsTracker` utility logs a summary table of all 33 stage outcomes in the `afterAll` hook.
 - The test generates a unique `TEST_RUN_ID` timestamp to prevent name collisions.
+- After reconciliation, the invoice status is checked: if **"In Processing"** the final review proceeds; if **"Closed"** the final review is skipped via `test.skip()`.
 - Recipe cost verification retries up to 5 times with 15-second intervals to allow server-side recalculation.
 - The suite tests recipe deactivation protection across three scenarios: same tenant, same-concept/same-company, and same-concept/cross-company.

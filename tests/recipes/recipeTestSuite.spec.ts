@@ -3,6 +3,7 @@ import { ProductPage } from '../../pages/product/ProductPage';
 import { VendorItemPage } from '../../pages/vendorItem/VendorItemPage';
 import { OrderPage } from '../../pages/reconciliation/OrderPage';
 import { MenuItemsPage } from '../../pages/recipe/MenuItemsPage';
+import { RecipeSetupPage } from '../../pages/recipe/RecipeSetupPage';
 import { CountSheet } from '../../pages/inventory&CountSheet/CountSheet';
 import { Inventory } from '../../pages/inventory&CountSheet/Inventory';
 import { RestaurantUnitPage } from '../../pages/restaurantUnit/RestaurantUnitPage';
@@ -18,9 +19,11 @@ test.describe('Recipe Test Suite', () => {
   let countSheetPage: CountSheet;
   let inventoryPage: Inventory;
   let restaurantUnitPage: RestaurantUnitPage;
+  let recipeSetupPage: RecipeSetupPage;
   let invoiceNumber: string;
 
   const { results, logResults } = createResultsTracker('Recipe Test Suite', [
+    'Add Menu Recipe Type',
     'Add Product',
     'Add Vendor Item',
     'Add Menu Item',
@@ -65,17 +68,24 @@ test.describe('Recipe Test Suite', () => {
     countSheetPage = new CountSheet(persistentPage);
     inventoryPage = new Inventory(persistentPage);
     restaurantUnitPage = new RestaurantUnitPage(persistentPage);
+    recipeSetupPage = new RecipeSetupPage(persistentPage);
   });
 
   test.afterAll(async () => {
     logResults();
   });
 
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║                             Products                                  ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- Recipe Types ---
 
-  // Stage 1: Add a new product
+  test('Add Menu recipe type', async () => {
+    await recipeSetupPage.navigateToRecipeSetup();
+    await recipeSetupPage.clickManageRecipeTypes();
+    await recipeSetupPage.addRecipeType(testNames.recipeTypeMenu, 'Menu Items');
+    results['Add Menu Recipe Type'] = 'passed';
+  });
+
+  // --- Products ---
+
   test('Add new product', async () => {
     await productPage.navigateViaLeftNav();
     await productPage.verifyProductsPageLoaded();
@@ -88,11 +98,8 @@ test.describe('Recipe Test Suite', () => {
     results['Add Product'] = 'passed';
   });
 
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║                           Vendor Items                                ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- Vendor Items ---
 
-  // Stage 2: Add a new vendor item and verify it appears in the list
   test('Add new vendor item', async () => {
     await vendorItemPage.navigateViaLeftNav();
     await vendorItemPage.verifyVendorItemsPageLoaded();
@@ -107,22 +114,18 @@ test.describe('Recipe Test Suite', () => {
     results['Add Vendor Item'] = 'passed';
   });
 
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║                      Recipe Add/Update Check                          ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- Recipe Add/Update Check ---
 
-  // Stage 3: Add a new menu item and verify redirect
   test('Add new menu item', async () => {
     await menuItemsPage.navigateToMenuItems();
     await menuItemsPage.verifyMenuItemsPageLoaded();
     await menuItemsPage.openAddMenuItemForm();
-    await menuItemsPage.fillMenuItemDetails(testNames.recipe, 'test', '1', 'case');
+    await menuItemsPage.fillMenuItemDetails(testNames.recipe, testNames.recipeTypeMenu, '1', 'case');
     await menuItemsPage.clickSave();
     await menuItemsPage.verifyRedirectedToMenuItemsList();
     results['Add Menu Item'] = 'passed';
   });
 
-  // Stage 4: Open menu item, edit recipe, add ingredient, save
   test('Edit menu item - add ingredient', async () => {
     await menuItemsPage.verifyMenuItemsPageLoaded();
     await menuItemsPage.openMenuItemByName(testNames.recipe);
@@ -133,11 +136,8 @@ test.describe('Recipe Test Suite', () => {
     results['Edit Menu Item'] = 'passed';
   });
 
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║                       Recipe Price Updating                           ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- Recipe Price Updating Using Invoice Processing ---
 
-  // Stage 5: Upload an invoice image and dismiss the status modal
   test('Upload invoice', async () => {
     await orderPage.navigateToOrdersList();
     await orderPage.clearSearchInput();
@@ -146,19 +146,16 @@ test.describe('Recipe Test Suite', () => {
     results['File Uploaded'] = 'passed';
   });
 
-  // Stage 6: End preprocessing
   test('End preprocessing', async () => {
     await orderPage.endPreprocessing();
     results['End Preprocessing'] = 'passed';
   });
 
-  // Stage 7: Verify the uploaded invoice shows "In Processing" status
   test('Verify invoice status is In Processing', async () => {
     await orderPage.navigateToOrdersList();
     await orderPage.verifyInvoiceStatusInProcessing();
   });
 
-  // Stage 8: Fill initial review form and complete it
   test('Complete initial review', async () => {
     await orderPage.navigateToOrdersList();
     await orderPage.openFirstInProcessingOrder();
@@ -173,7 +170,6 @@ test.describe('Recipe Test Suite', () => {
     results['Initial Review'] = 'passed';
   });
 
-  // Stage 9: Process invoice lock, add line item, complete reconciliation
   test('Complete reconciliation', async () => {
     await orderPage.navigateToOrdersList();
     await orderPage.searchAndOpenOrder(invoiceNumber);
@@ -190,8 +186,28 @@ test.describe('Recipe Test Suite', () => {
     results['Reconciliation'] = 'passed';
   });
 
-  // Stage 10: Mark order reviewed and close
+  // --- Verify Status & Complete Final Review ---
+
+  let invoiceStatus: 'in_processing' | 'closed' = 'in_processing';
+
+  test('Verify invoice status after reconciliation', async () => {
+    await orderPage.navigateToOrdersList();
+    await orderPage.searchOrderInList(invoiceNumber);
+
+    const inProcessingCell = orderPage['page'].getByRole('cell', { name: /in processing/i }).first();
+    const closedCell = orderPage['page'].getByRole('cell', { name: /closed/i }).first();
+
+    try {
+      await inProcessingCell.waitFor({ state: 'visible', timeout: 15000 });
+      invoiceStatus = 'in_processing';
+    } catch {
+      await closedCell.waitFor({ state: 'visible', timeout: 15000 });
+      invoiceStatus = 'closed';
+    }
+  });
+
   test('Complete final review', async () => {
+    test.skip(invoiceStatus !== 'in_processing', 'Skipping — invoice is already Closed');
     await orderPage.navigateToOrdersList();
     await orderPage.searchAndOpenOrder(invoiceNumber);
     await orderPage.markOrderReviewedForClose();
@@ -200,7 +216,6 @@ test.describe('Recipe Test Suite', () => {
     results['Final Review'] = 'passed';
   });
 
-  // Stage 11: Search, open, edit and save the created product
   test('Edit product', async () => {
     await productPage.navigateViaLeftNav();
     await productPage.verifyProductsPageLoaded();
@@ -211,7 +226,6 @@ test.describe('Recipe Test Suite', () => {
     results['Edit Product'] = 'passed';
   });
 
-  // Stage 12: Verify recipe cost updated after order close (retries up to 5 times)
   test('Verify recipe cost after order close', async ({ persistentPage }) => {
     let cost = '';
     for (let attempt = 1; attempt <= 5; attempt++) {
@@ -230,11 +244,8 @@ test.describe('Recipe Test Suite', () => {
     results['Verify Recipe Cost'] = 'passed';
   });
 
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║              Recipe Active/Deactive By Modifying Inventory             ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- Recipe Active/Deactive By Modifying Inventory ---
 
-  // Stage 13: Create a count sheet
   test('Create an inventory count sheet', async () => {
     await countSheetPage.navigateToInventorySetup();
     await countSheetPage.clickAddCountSheet();
@@ -247,7 +258,6 @@ test.describe('Recipe Test Suite', () => {
     results['Create Count Sheet'] = 'passed';
   });
 
-  // Stage 14: Close inventory count
   test('Close inventory count', async () => {
     await inventoryPage.navigateToInventoryCounts();
     await inventoryPage.selectMyStoreTab();
@@ -261,7 +271,6 @@ test.describe('Recipe Test Suite', () => {
     results['Close Inventory'] = 'passed';
   });
 
-  // Stage 15: Update count sheet — remove recipe
   test('Update inventory count sheet', async () => {
     await countSheetPage.navigateToInventorySetup();
     await countSheetPage.openCountSheet(testNames.countSheet);
@@ -271,7 +280,6 @@ test.describe('Recipe Test Suite', () => {
     results['Update Inventory'] = 'passed';
   });
 
-  // Stage 16: Reopen the closed inventory
   test('Reopen closed inventory', async () => {
     await inventoryPage.navigateToInventoryCounts();
     await inventoryPage.selectMyStoreTab();
@@ -281,7 +289,6 @@ test.describe('Recipe Test Suite', () => {
     results['Reopen Inventory'] = 'passed';
   });
 
-  // Stage 17: Deactivate recipe — toggle off
   test('Deactivate recipe', async () => {
     await menuItemsPage.navigateToMenuItems();
     await menuItemsPage.verifyMenuItemsPageLoaded();
@@ -290,7 +297,6 @@ test.describe('Recipe Test Suite', () => {
     results['Deactivate Recipe'] = 'passed';
   });
 
-  // Stage 18: Delete the saved/reopened inventory
   test('Delete saved inventory', async () => {
     await inventoryPage.navigateToInventoryCounts();
     await inventoryPage.selectMyStoreTab();
@@ -301,7 +307,6 @@ test.describe('Recipe Test Suite', () => {
     results['Delete Inventory'] = 'passed';
   });
 
-  // Stage 19: Deactivate recipe again — should succeed now that inventory is deleted
   test('Deactivate recipe after inventory delete', async () => {
     await menuItemsPage.navigateToMenuItems();
     await menuItemsPage.verifyMenuItemsPageLoaded();
@@ -312,11 +317,8 @@ test.describe('Recipe Test Suite', () => {
     results['Deactivate Recipe After Delete Inventory'] = 'passed';
   });
 
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║          Same Company Concept Tenant Check                            ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- Recipe Active/Deactive Same Company Concept Tenant Check ---
 
-  // Stage 20: Add a second product
   test('Add new product 2', async () => {
     await productPage.navigateViaLeftNav();
     await productPage.verifyProductsPageLoaded();
@@ -329,19 +331,17 @@ test.describe('Recipe Test Suite', () => {
     results['Add Product 2'] = 'passed';
   });
 
-  // Stage 21: Create a second recipe/menu item with ingredient
   test('Add new menu item 2', async () => {
     await menuItemsPage.navigateToMenuItems();
     await menuItemsPage.verifyMenuItemsPageLoaded();
     await menuItemsPage.openAddMenuItemForm();
-    await menuItemsPage.fillMenuItemDetails(testNames.recipe2, 'test', '1', 'case');
+    await menuItemsPage.fillMenuItemDetails(testNames.recipe2, testNames.recipeTypeMenu, '1', 'case');
     await menuItemsPage.addIngredient(testNames.product2, '1', 'case');
     await menuItemsPage.clickSave();
     await menuItemsPage.verifyRedirectedToMenuItemsList();
     results['Add Menu Item 2'] = 'passed';
   });
 
-  // Stage 22: Create a second count sheet
   test('Create an inventory count sheet 2', async () => {
     await countSheetPage.navigateToInventorySetup();
     await countSheetPage.clickAddCountSheet();
@@ -354,7 +354,6 @@ test.describe('Recipe Test Suite', () => {
     results['Create Count Sheet 2'] = 'passed';
   });
 
-  // Stage 23: Save and exit inventory count
   test('Save and exit inventory count 2', async () => {
     await inventoryPage.navigateToInventoryCounts();
     await inventoryPage.selectMyStoreTab();
@@ -366,13 +365,11 @@ test.describe('Recipe Test Suite', () => {
     results['Close Inventory 2'] = 'passed';
   });
 
-  // Stage 24: Switch tenant to Wasabi Natick
   test('Switch tenant to Wasabi Natick', async () => {
     await menuItemsPage.switchTenant('Wasabi Natick');
     results['Switch Tenant'] = 'passed';
   });
 
-  // Stage 25: Verify recipe in use cannot be deactivated
   test('Verify recipe in use cannot be deactivated', async () => {
     await menuItemsPage.navigateToMenuItems();
     await menuItemsPage.verifyMenuItemsPageLoaded();
@@ -382,17 +379,13 @@ test.describe('Recipe Test Suite', () => {
     results['Deactivate Recipe In Use'] = 'passed';
   });
 
-  // Stage 26: Switch tenant back to Wasabi Tysons
   test('Switch tenant back to Wasabi Tysons', async () => {
     await menuItemsPage.switchTenant('Wasabi Tysons');
     results['Switch Tenant Back'] = 'passed';
   });
 
-  // ╔═════════════════════════════════════════════════════════════════════════╗
-  // ║          Cross Company Concept Tenant Check                           ║
-  // ╚═════════════════════════════════════════════════════════════════════════╝
+  // --- Recipe Active/Deactive Different Company Concept Tenant Check ---
 
-  // Stage 27: Add a new tenant (Same Concept + Different Company)
   test('Add new tenant', async () => {
     await restaurantUnitPage.navigateViaLeftNav();
     await restaurantUnitPage.verifyRestaurantUnitsPageLoaded();
@@ -412,7 +405,6 @@ test.describe('Recipe Test Suite', () => {
     results['Add Tenant'] = 'passed';
   });
 
-  // Stage 28: Add a third product
   test('Add new product 3', async () => {
     await productPage.navigateViaLeftNav();
     await productPage.verifyProductsPageLoaded();
@@ -425,19 +417,17 @@ test.describe('Recipe Test Suite', () => {
     results['Add Product 3'] = 'passed';
   });
 
-  // Stage 29: Create a third recipe/menu item with ingredient
   test('Add new menu item 3', async () => {
     await menuItemsPage.navigateToMenuItems();
     await menuItemsPage.verifyMenuItemsPageLoaded();
     await menuItemsPage.openAddMenuItemForm();
-    await menuItemsPage.fillMenuItemDetails(testNames.recipe3, 'test', '1', 'case');
+    await menuItemsPage.fillMenuItemDetails(testNames.recipe3, testNames.recipeTypeMenu, '1', 'case');
     await menuItemsPage.addIngredient(testNames.product3, '1', 'case');
     await menuItemsPage.clickSave();
     await menuItemsPage.verifyRedirectedToMenuItemsList();
     results['Add Menu Item 3'] = 'passed';
   });
 
-  // Stage 30: Create a third count sheet
   test('Create an inventory count sheet 3', async () => {
     await countSheetPage.navigateToInventorySetup();
     await countSheetPage.clickAddCountSheet();
@@ -450,7 +440,6 @@ test.describe('Recipe Test Suite', () => {
     results['Create Count Sheet 3'] = 'passed';
   });
 
-  // Stage 31: Save and exit inventory count
   test('Save and exit inventory count 3', async () => {
     await inventoryPage.navigateToInventoryCounts();
     await inventoryPage.selectMyStoreTab();
@@ -462,13 +451,11 @@ test.describe('Recipe Test Suite', () => {
     results['Save and Exit Inventory 3'] = 'passed';
   });
 
-  // Stage 32: Switch tenant to the newly created tenant
   test('Switch tenant to new tenant', async () => {
     await menuItemsPage.switchTenant(testNames.tenant);
     results['Switch Tenant To New'] = 'passed';
   });
 
-  // Stage 33: Verify recipe in use cannot be deactivated in new tenant
   test('Verify recipe in use cannot be deactivated in new tenant', async () => {
     await menuItemsPage.navigateToMenuItems();
     await menuItemsPage.verifyMenuItemsPageLoaded();
@@ -478,7 +465,6 @@ test.describe('Recipe Test Suite', () => {
     results['Deactivate Recipe In Use 2'] = 'passed';
   });
 
-  // Stage 34: Switch tenant back to Wasabi Tysons
   test('Switch tenant back to Wasabi Tysons after new tenant', async () => {
     await menuItemsPage.switchTenant('Wasabi Tysons');
     results['Switch Tenant Back 2'] = 'passed';
