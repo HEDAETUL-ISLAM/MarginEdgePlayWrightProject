@@ -1,5 +1,6 @@
 import { Page, Locator, expect } from '@playwright/test';
 import { BasePage, TIMEOUT } from '../BasePage';
+import * as path from 'path';
 
 export class MenuItemsPage extends BasePage {
   private readonly recipesNavLink: Locator;
@@ -12,6 +13,7 @@ export class MenuItemsPage extends BasePage {
   private readonly unitInput: Locator;
   private readonly saveButton: Locator;
   private readonly editRecipeButton: Locator;
+  private readonly addStepButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -25,6 +27,7 @@ export class MenuItemsPage extends BasePage {
     this.unitInput = page.getByPlaceholder('Select unit');
     this.saveButton = page.getByRole('button', { name: 'Save' });
     this.editRecipeButton = page.getByRole('button', { name: /edit recipe/i });
+    this.addStepButton = page.getByRole('button', { name: /add step/i });
   }
 
   async navigateToMenuItems() {
@@ -92,14 +95,14 @@ export class MenuItemsPage extends BasePage {
   }
 
   async addIngredient(item: string, quantity: string, unit: string) {
-    const itemInput = this.page.getByPlaceholder('Type to see options').first();
+    const itemInput = this.page.getByPlaceholder('Type to see options').last();
     await itemInput.waitFor({ state: 'visible', timeout: TIMEOUT.default });
     await itemInput.click();
     await itemInput.fill(item);
     await this.page.getByRole('option', { name: item }).first().click();
     await this.page.waitForTimeout(500);
 
-    const ingredientRow = this.page.getByRole('row').filter({ has: this.page.getByPlaceholder('Type to see options') });
+    const ingredientRow = this.page.getByRole('row').filter({ has: this.page.getByPlaceholder('Type to see options') }).last();
     await ingredientRow.getByRole('textbox', { name: 'Quantity' }).fill(quantity);
 
     const unitInput = ingredientRow.getByPlaceholder('Unit');
@@ -172,5 +175,106 @@ export class MenuItemsPage extends BasePage {
       }
     }
     return '';
+  }
+
+  async searchMenuItem(name: string) {
+    const searchInput = this.page.getByRole('textbox', { name: 'Search', exact: true });
+    await searchInput.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await searchInput.fill(name);
+    await this.page.waitForTimeout(2000);
+  }
+
+  async verifyMethodSteps(expectedMethods: string[]) {
+    const methodHeading = this.page.getByRole('heading', { name: 'Method' });
+    await methodHeading.scrollIntoViewIfNeeded();
+    await expect(methodHeading).toBeVisible({ timeout: TIMEOUT.default });
+
+    const methodSection = methodHeading.locator('..');
+    for (let i = 0; i < expectedMethods.length; i++) {
+      const stepNumber = `${i + 1}.`;
+      const stepText = expectedMethods[i];
+
+      // Verify step text is visible
+      const stepSpan = methodSection.getByText(stepText);
+      await expect(stepSpan).toBeVisible({ timeout: TIMEOUT.default });
+
+      // Verify step number is visible
+      const numberSpan = methodSection.getByText(stepNumber, { exact: true });
+      await expect(numberSpan).toBeVisible({ timeout: TIMEOUT.default });
+
+      // Verify image is visible for this step
+      const methodImage = methodSection.getByAltText('Recipe Method Media').nth(i);
+      await expect(methodImage).toBeVisible({ timeout: TIMEOUT.default });
+    }
+  }
+
+  async scrollToMethodSection() {
+    const methodSection = this.page.getByText('Method', { exact: true });
+    await methodSection.scrollIntoViewIfNeeded();
+    await this.page.waitForTimeout(500);
+  }
+
+  async enterMethodText(stepIndex: number, text: string) {
+    const textarea = this.page.locator('textarea.MuiInputBase-inputMultiline:not([aria-hidden="true"]):not([readonly])').nth(stepIndex);
+    await textarea.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await textarea.click();
+    await this.page.waitForTimeout(300);
+    await textarea.fill(text);
+    await this.page.waitForTimeout(500);
+  }
+
+  async uploadMethodAttachment(stepIndex: number, filePath: string) {
+    const uploadButton = this.page.locator('[data-testid="fileUploadButton"]').nth(stepIndex);
+    await uploadButton.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+
+    // Click once to move focus away from the textbox to the upload button
+    await uploadButton.click();
+    await this.page.waitForTimeout(500);
+
+    // Click again to trigger the file chooser
+    const fileChooserPromise = this.page.waitForEvent('filechooser');
+    await uploadButton.click();
+
+    const fileChooser = await fileChooserPromise;
+    const absolutePath = path.resolve(filePath);
+    await fileChooser.setFiles(absolutePath);
+    await this.page.waitForTimeout(2000);
+  }
+
+  async clickAddStep() {
+    await this.addStepButton.scrollIntoViewIfNeeded();
+    await this.addStepButton.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await this.addStepButton.click();
+    await this.page.waitForTimeout(1000);
+  }
+
+  async clickAddIngredient() {
+    const addButton = this.page.getByRole('button', { name: 'Add ingredient' });
+    await addButton.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await addButton.click();
+    await this.page.waitForTimeout(500);
+  }
+
+  async setGlobalMenuPrice(price: string) {
+    const priceInput = this.page.getByRole('textbox', { name: 'Global Menu Price' });
+    await priceInput.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await priceInput.clear();
+    await priceInput.fill(price);
+    await this.page.waitForTimeout(500);
+  }
+
+  async addMultipleMethods(methods: { text: string; filePath: string }[]) {
+    const fixturesDir = path.resolve('fixtures', 'files', 'recipeMethod');
+
+    for (let i = 0; i < methods.length; i++) {
+      if (i > 0) {
+        await this.clickAddStep();
+      }
+
+      await this.scrollToMethodSection();
+      const fullPath = path.resolve(fixturesDir, methods[i].filePath);
+      await this.enterMethodText(i, methods[i].text);
+      await this.uploadMethodAttachment(i, fullPath);
+    }
   }
 }

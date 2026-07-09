@@ -153,6 +153,17 @@ export class ProductPage extends BasePage {
     await this.waitForPageLoad();
   }
 
+  async setProductPrice(price: string) {
+    await this.page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await this.page.waitForTimeout(1000);
+    const priceInput = this.page.locator('input[name="reportPrice"][ng-model="displayReportUnitPrice"]:not([ng-disabled])');
+    await priceInput.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await priceInput.clear();
+    await priceInput.fill(price);
+    await priceInput.blur();
+    await this.page.waitForTimeout(500);
+  }
+
   async addProduct(name: string, category: string, unit: string) {
     await this.clickAddProduct();
     await this.enterProductName(name);

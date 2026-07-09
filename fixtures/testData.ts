@@ -27,4 +27,7 @@ export const testNames = {
   recipeTypeMenu: `Menu Type ${TEST_RUN_ID}`,
   recipeTypePrepared: `Prepared Type ${TEST_RUN_ID}`,
   recipeTypeBar: `Bar Type ${TEST_RUN_ID}`,
+  plateCostProduct1: `PlateCost Product1 ${TEST_RUN_ID}`,
+  plateCostProduct2: `PlateCost Product2 ${TEST_RUN_ID}`,
+  plateCostRecipe: `PlateCost Recipe ${TEST_RUN_ID}`,
 };
