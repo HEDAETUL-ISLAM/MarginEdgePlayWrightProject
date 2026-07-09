@@ -30,4 +30,5 @@ export const testNames = {
   plateCostProduct1: `PlateCost Product1 ${TEST_RUN_ID}`,
   plateCostProduct2: `PlateCost Product2 ${TEST_RUN_ID}`,
   plateCostRecipe: `PlateCost Recipe ${TEST_RUN_ID}`,
+  plateCostRecipeAsIngredient: `PlateCost SubRecipe ${TEST_RUN_ID}`,
 };

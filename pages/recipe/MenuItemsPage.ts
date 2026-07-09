@@ -263,6 +263,13 @@ export class MenuItemsPage extends BasePage {
     await this.page.waitForTimeout(500);
   }
 
+  async getDetailPagePlateCost(): Promise<string> {
+    const plateCostInput = this.page.getByRole('textbox', { name: 'Plate Cost' });
+    await plateCostInput.scrollIntoViewIfNeeded();
+    await plateCostInput.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    return (await plateCostInput.inputValue()).trim();
+  }
+
   async addMultipleMethods(methods: { text: string; filePath: string }[]) {
     const fixturesDir = path.resolve('fixtures', 'files', 'recipeMethod');
 

@@ -29,6 +29,9 @@ test.describe('Recipe Test Suite', () => {
     'Add Plate Cost Product 1',
     'Add Plate Cost Product 2',
     'Add Plate Cost Recipe',
+    'Add Plate Cost Recipe As Ingredient',
+    'Verify Plate Cost Detail Page Recipe',
+    'Verify Plate Cost Detail Page SubRecipe',
     'Add Product',
     'Add Vendor Item',
     'Add Menu Item',
@@ -172,6 +175,47 @@ test.describe('Recipe Test Suite', () => {
     expect(rowText).toContain('25.0%');
 
     results['Add Plate Cost Recipe'] = 'passed';
+  });
+
+  test('Create recipe using plate cost recipe as ingredient and verify cost', async () => {
+    await menuItemsPage.navigateToMenuItems();
+    await menuItemsPage.verifyMenuItemsPageLoaded();
+    await menuItemsPage.openAddMenuItemForm();
+    await menuItemsPage.fillMenuItemDetails(testNames.plateCostRecipeAsIngredient, testNames.recipeTypeMenu, '1', 'each');
+    await menuItemsPage.addIngredient(testNames.plateCostRecipe, '1', 'each');
+    await menuItemsPage.setGlobalMenuPrice('100');
+    await menuItemsPage.clickSave();
+    await menuItemsPage.verifyRedirectedToMenuItemsList();
+
+    await menuItemsPage.searchMenuItem(testNames.plateCostRecipeAsIngredient);
+    const cost = await menuItemsPage.getMenuItemCost(testNames.plateCostRecipeAsIngredient);
+    expect(cost).toBe('25.00');
+
+    const row = menuItemsPage['page'].getByRole('row').filter({ hasText: testNames.plateCostRecipeAsIngredient }).first();
+    const rowText = await row.textContent();
+    expect(rowText).toContain('25.0%');
+
+    results['Add Plate Cost Recipe As Ingredient'] = 'passed';
+  });
+
+  test('Verify plate cost on detail page for plate cost recipe', async () => {
+    await menuItemsPage.navigateToMenuItems();
+    await menuItemsPage.verifyMenuItemsPageLoaded();
+    await menuItemsPage.searchMenuItem(testNames.plateCostRecipe);
+    await menuItemsPage.openMenuItemByName(testNames.plateCostRecipe);
+    const plateCost = await menuItemsPage.getDetailPagePlateCost();
+    expect(plateCost).toBe('25');
+    results['Verify Plate Cost Detail Page Recipe'] = 'passed';
+  });
+
+  test('Verify plate cost on detail page for sub-recipe', async () => {
+    await menuItemsPage.navigateToMenuItems();
+    await menuItemsPage.verifyMenuItemsPageLoaded();
+    await menuItemsPage.searchMenuItem(testNames.plateCostRecipeAsIngredient);
+    await menuItemsPage.openMenuItemByName(testNames.plateCostRecipeAsIngredient);
+    const plateCost = await menuItemsPage.getDetailPagePlateCost();
+    expect(plateCost).toBe('25');
+    results['Verify Plate Cost Detail Page SubRecipe'] = 'passed';
   });
 
   // // --- Product Create ---
