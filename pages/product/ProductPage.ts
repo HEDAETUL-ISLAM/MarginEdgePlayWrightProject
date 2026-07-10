@@ -184,6 +184,25 @@ export class ProductPage extends BasePage {
     await this.page.waitForTimeout(1000);
   }
 
+  async editUsedProductUnit(unit: string) {
+    const editUnitAndNameButton = this.page.getByRole('button', { name: /edit unit and name/i });
+    await editUnitAndNameButton.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await editUnitAndNameButton.click();
+
+    const modal = this.page.locator('.modal-dialog.modal-md').filter({ hasText: /how do you want to see this product on reports/i });
+    await modal.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+
+    const unitSelect = modal.locator('select[name="reportUnit"]');
+    await unitSelect.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await unitSelect.selectOption({ label: unit });
+    await this.page.waitForTimeout(500);
+
+    const modalSaveButton = modal.locator('button[type="submit"]');
+    await modalSaveButton.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await modalSaveButton.click();
+    await this.page.waitForTimeout(1000);
+  }
+
   async addProduct(name: string, category: string, unit: string) {
     await this.clickAddProduct();
     await this.enterProductName(name);

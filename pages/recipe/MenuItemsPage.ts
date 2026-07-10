@@ -178,7 +178,7 @@ export class MenuItemsPage extends BasePage {
   }
 
   async searchMenuItem(name: string) {
-    const searchInput = this.page.getByRole('textbox', { name: 'Search', exact: true });
+    const searchInput = this.page.locator('input[placeholder="Search"]');
     await searchInput.waitFor({ state: 'visible', timeout: TIMEOUT.default });
     await searchInput.fill(name);
     await this.page.waitForTimeout(2000);
@@ -241,6 +241,39 @@ export class MenuItemsPage extends BasePage {
     await this.page.waitForTimeout(2000);
   }
 
+  async uploadUnsupportedMethodAttachment(stepIndex: number, filePath: string) {
+    const uploadButton = this.page.locator('[data-testid="fileUploadButton"]').nth(stepIndex);
+    await uploadButton.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+
+    await uploadButton.click();
+    await this.page.waitForTimeout(500);
+
+    const fileChooserPromise = this.page.waitForEvent('filechooser');
+    await uploadButton.click();
+
+    const fileChooser = await fileChooserPromise;
+    const fixturesDir = path.resolve('fixtures', 'files', 'recipeMethod');
+    const absolutePath = path.resolve(fixturesDir, filePath);
+    await fileChooser.setFiles(absolutePath);
+    await this.page.waitForTimeout(2000);
+
+    // Verify the unsupported format modal appears
+    const modal = this.page.getByRole('dialog').filter({ hasText: /unsupported image format detected/i });
+    await modal.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await expect(modal).toBeVisible();
+
+    const modalText = await modal.textContent();
+    expect(modalText).toContain('The image you uploaded is not in a supported format (PNG, JPG, or JPEG)');
+    expect(modalText).toContain('Please select an image in a supported format and try again');
+
+    // Dismiss the modal
+    const closeButton = modal.getByRole('button').first();
+    if (await this.isVisible(closeButton)) {
+      await closeButton.click();
+      await this.page.waitForTimeout(500);
+    }
+  }
+
   async clickAddStep() {
     await this.addStepButton.scrollIntoViewIfNeeded();
     await this.addStepButton.waitFor({ state: 'visible', timeout: TIMEOUT.default });
@@ -261,6 +294,25 @@ export class MenuItemsPage extends BasePage {
     await priceInput.clear();
     await priceInput.fill(price);
     await this.page.waitForTimeout(500);
+  }
+
+  async getDetailPageIngredientTotal(): Promise<string> {
+    await this.page.waitForTimeout(2000);
+    // Scroll to the very bottom of the page
+    await this.page.evaluate(async () => {
+      const scrollableElements = document.querySelectorAll('*');
+      for (const el of scrollableElements) {
+        if (el.scrollHeight > el.clientHeight) {
+          el.scrollTop = el.scrollHeight;
+        }
+      }
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+    await this.page.waitForTimeout(2000);
+    const ingredientTotalInput = this.page.getByRole('textbox', { name: 'Ingredient Total' });
+    await ingredientTotalInput.scrollIntoViewIfNeeded();
+    await ingredientTotalInput.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    return (await ingredientTotalInput.inputValue()).trim();
   }
 
   async getDetailPagePlateCost(): Promise<string> {

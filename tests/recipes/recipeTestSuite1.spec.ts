@@ -22,25 +22,32 @@ test.describe('Recipe Test Suite', () => {
   let recipeSetupPage: RecipeSetupPage;
 
   const { results, logResults } = createResultsTracker('Recipe Test Suite', [
+    // Recipe Type
     'Add Menu Recipe Type',
+    // Recipe Methods
     'Add Menu Item With Methods',
     'Verify Recipe Methods',
+    'Unsupported Image Format Modal',
+    // Plate Cost — Create & Verify
     'Add Plate Cost Product 1',
     'Add Plate Cost Product 2',
     'Add Plate Cost Recipe',
     'Add Plate Cost Recipe As Ingredient',
     'Verify Plate Cost Detail Page Recipe',
     'Verify Plate Cost Detail Page SubRecipe',
+    // Plate Cost — Update & Verify
     'Edit Plate Cost Product 1 Price',
     'Edit Plate Cost Product 2 Price',
     'Verify Updated Plate Cost Recipe',
     'Verify Updated Plate Cost SubRecipe',
     'Verify Updated Plate Cost Detail Page Recipe',
     'Verify Updated Plate Cost Detail Page SubRecipe',
+    // Duplicate Recipe
     'Add Duplicate Recipe Product',
     'Create Duplicate Recipe Source',
     'Create Duplicate Recipe',
     'Verify Duplicate Recipe Name',
+    // Cross-Tenant — Duplicate Recipe
     'Switch Tenant To Natick For Duplicate',
     'Verify Duplicate Recipe In Natick',
     'Switch Tenant Back After Duplicate',
@@ -62,7 +69,9 @@ test.describe('Recipe Test Suite', () => {
     logResults();
   });
 
-  // --- Recipe Types ---
+  // ==========================================
+  // Stage 1: Recipe Type Setup
+  // ==========================================
 
   test('Add Menu recipe type', async () => {
     await recipeSetupPage.navigateToRecipeSetup();
@@ -71,7 +80,9 @@ test.describe('Recipe Test Suite', () => {
     results['Add Menu Recipe Type'] = 'passed';
   });
 
-  // --- New Menu Item with Methods ---
+  // ==========================================
+  // Stage 2: Recipe Methods — Create & Verify
+  // ==========================================
 
   test('Add menu item with 5 method steps and attachments', async () => {
     await menuItemsPage.navigateToMenuItems();
@@ -105,7 +116,19 @@ test.describe('Recipe Test Suite', () => {
     results['Verify Recipe Methods'] = 'passed';
   });
 
-  // --- Plate Cost Tests ---
+  test('Verify unsupported image format modal on method upload', async () => {
+    await menuItemsPage.navigateToMenuItems();
+    await menuItemsPage.verifyMenuItemsPageLoaded();
+    await menuItemsPage.openAddMenuItemForm();
+    await menuItemsPage.fillMenuItemDetails(testNames.recipe, testNames.recipeTypeMenu, '1', 'case');
+    await menuItemsPage.scrollToMethodSection();
+    await menuItemsPage.uploadUnsupportedMethodAttachment(0, 'unsupported.avif');
+    results['Unsupported Image Format Modal'] = 'passed';
+  });
+
+  // ==========================================
+  // Stage 3: Plate Cost — Products & Recipe
+  // ==========================================
 
   test('Add plate cost product 1 with price $10', async () => {
     await productPage.navigateViaLeftNav();
@@ -156,6 +179,10 @@ test.describe('Recipe Test Suite', () => {
     results['Add Plate Cost Recipe'] = 'passed';
   });
 
+  // ==========================================
+  // Stage 4: Plate Cost — SubRecipe & Detail Page
+  // ==========================================
+
   test('Create recipe using plate cost recipe as ingredient and verify cost', async () => {
     await menuItemsPage.navigateToMenuItems();
     await menuItemsPage.verifyMenuItemsPageLoaded();
@@ -197,7 +224,9 @@ test.describe('Recipe Test Suite', () => {
     results['Verify Plate Cost Detail Page SubRecipe'] = 'passed';
   });
 
-  // --- Update Product Prices and Verify Plate Cost ---
+  // ==========================================
+  // Stage 5: Plate Cost — Update Prices & Verify
+  // ==========================================
 
   test('Edit plate cost product 1 price from $10 to $20', async () => {
     await productPage.navigateViaLeftNav();
@@ -271,7 +300,9 @@ test.describe('Recipe Test Suite', () => {
     results['Verify Updated Plate Cost Detail Page SubRecipe'] = 'passed';
   });
 
-  // --- Duplicate Recipe Tests ---
+  // ==========================================
+  // Stage 6: Duplicate Recipe — Create & Verify
+  // ==========================================
 
   test('Add product for duplicate recipe with price $10', async () => {
     await productPage.navigateViaLeftNav();
@@ -315,6 +346,10 @@ test.describe('Recipe Test Suite', () => {
     expect(nameOnPage).toContain(duplicateName);
     results['Verify Duplicate Recipe Name'] = 'passed';
   });
+
+  // ==========================================
+  // Stage 7: Cross-Tenant — Duplicate Recipe
+  // ==========================================
 
   test('Switch tenant to Wasabi Natick after duplicate', async () => {
     await menuItemsPage.switchTenant('Wasabi Natick');

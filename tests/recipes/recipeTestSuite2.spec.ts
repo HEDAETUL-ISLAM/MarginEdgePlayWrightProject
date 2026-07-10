@@ -4,9 +4,6 @@ import { VendorItemPage } from '../../pages/vendorItem/VendorItemPage';
 import { OrderPage } from '../../pages/reconciliation/OrderPage';
 import { MenuItemsPage } from '../../pages/recipe/MenuItemsPage';
 import { RecipeSetupPage } from '../../pages/recipe/RecipeSetupPage';
-import { CountSheet } from '../../pages/inventory&CountSheet/CountSheet';
-import { Inventory } from '../../pages/inventory&CountSheet/Inventory';
-import { RestaurantUnitPage } from '../../pages/restaurantUnit/RestaurantUnitPage';
 import { testNames } from '../../fixtures/testData';
 
 test.describe.configure({ mode: 'serial' });
@@ -16,17 +13,19 @@ test.describe('Recipe Test Suite 2', () => {
   let vendorItemPage: VendorItemPage;
   let orderPage: OrderPage;
   let menuItemsPage: MenuItemsPage;
-  let countSheetPage: CountSheet;
-  let inventoryPage: Inventory;
-  let restaurantUnitPage: RestaurantUnitPage;
   let recipeSetupPage: RecipeSetupPage;
   let invoiceNumber: string;
 
   const { results, logResults } = createResultsTracker('Recipe Test Suite 2', [
+    // Tenant & Recipe Type
+    'Switch To Wasabi Tysons',
+    'Add Menu Recipe Type',
+    // Product, Vendor Item & Recipe
     'Add Product',
     'Add Vendor Item',
     'Add Menu Item',
-    'Edit Menu Item',
+    'Verify Recipe Price',
+    // Invoice Processing
     'File Uploaded',
     'End Preprocessing',
     'Initial Review',
@@ -34,28 +33,35 @@ test.describe('Recipe Test Suite 2', () => {
     'Final Review',
     'Edit Product',
     'Verify Recipe Cost',
-    'Create Count Sheet',
-    'Close Inventory',
-    'Update Inventory',
-    'Reopen Inventory',
-    'Deactivate Recipe',
-    'Delete Inventory',
-    'Deactivate Recipe After Delete Inventory',
-    'Add Product 2',
-    'Add Menu Item 2',
-    'Create Count Sheet 2',
-    'Close Inventory 2',
-    'Switch Tenant',
-    'Deactivate Recipe In Use',
-    'Switch Tenant Back',
-    'Add Tenant',
-    'Add Product 3',
-    'Add Menu Item 3',
-    'Create Count Sheet 3',
-    'Save and Exit Inventory 3',
-    'Switch Tenant To New',
-    'Deactivate Recipe In Use 2',
-    'Switch Tenant Back 2',
+    // Cross-Tenant — Invoice Price
+    'Switch Tenant To Natick For Price Check',
+    'Verify Old Price In Natick',
+    'Switch Tenant Back After Price Check',
+    // UoM Products & Recipe
+    'Add UoM Product 1',
+    'Add UoM Product 2',
+    'Add UoM Product 3',
+    'Add UoM Recipe',
+    'Verify UoM Recipe Price List',
+    'Verify UoM Recipe Ingredient Total',
+    // UoM SubRecipe
+    'Add UoM SubRecipe',
+    'Verify UoM SubRecipe Price List',
+    'Verify UoM SubRecipe Ingredient Total',
+    // Cross-Tenant — UoM Before Unit Change
+    'Switch To Wasabi Natick',
+    'Verify UoM Recipe Price In Natick',
+    'Verify UoM Recipe Ingredient Total In Natick',
+    'Switch Back To Wasabi Tysons',
+    // UoM Unit Change & Verification
+    'Change UoM Product 1 Unit To Pound',
+    'Verify UoM Recipe Price After Unit Change',
+    'Verify UoM SubRecipe Price After Unit Change',
+    // Cross-Tenant — UoM After Unit Change
+    'Switch To Natick After Unit Change',
+    'Verify UoM Recipe Price In Natick After Unit Change',
+    'Verify UoM SubRecipe Price In Natick After Unit Change',
+    'Switch Back To Tysons After Unit Change',
   ]);
 
   test.beforeAll(async ({ persistentPage }) => {
@@ -64,9 +70,6 @@ test.describe('Recipe Test Suite 2', () => {
     vendorItemPage = new VendorItemPage(persistentPage);
     orderPage = new OrderPage(persistentPage);
     menuItemsPage = new MenuItemsPage(persistentPage);
-    countSheetPage = new CountSheet(persistentPage);
-    inventoryPage = new Inventory(persistentPage);
-    restaurantUnitPage = new RestaurantUnitPage(persistentPage);
     recipeSetupPage = new RecipeSetupPage(persistentPage);
   });
 
@@ -74,7 +77,26 @@ test.describe('Recipe Test Suite 2', () => {
     logResults();
   });
 
-  // --- Product Create ---
+  // ==========================================
+  // Stage 1: Tenant & Recipe Type Setup
+  // ==========================================
+
+  test('Switch to Wasabi Tysons', async () => {
+    await menuItemsPage.navigateToMenuItems();
+    await menuItemsPage.switchTenant('Wasabi Tysons');
+    results['Switch To Wasabi Tysons'] = 'passed';
+  });
+
+  test('Add Menu recipe type', async () => {
+    await recipeSetupPage.navigateToRecipeSetup();
+    await recipeSetupPage.clickManageRecipeTypes();
+    await recipeSetupPage.addRecipeType(testNames.recipeTypeMenu, 'Menu Items');
+    results['Add Menu Recipe Type'] = 'passed';
+  });
+
+  // ==========================================
+  // Stage 2: Product, Vendor Item & Recipe
+  // ==========================================
 
   test('Add new product', async () => {
     await productPage.navigateViaLeftNav();
@@ -83,12 +105,11 @@ test.describe('Recipe Test Suite 2', () => {
     await productPage.enterProductName(testNames.product);
     await productPage.selectCategory('Cleaning Supplies');
     await productPage.selectUnit('Case');
+    await productPage.setProductPrice('75');
     await productPage.clickSave();
     await productPage.verifyProductCreated(testNames.product);
     results['Add Product'] = 'passed';
   });
-
-  // --- Vendor Items ---
 
   test('Add new vendor item', async () => {
     await vendorItemPage.navigateViaLeftNav();
@@ -98,35 +119,35 @@ test.describe('Recipe Test Suite 2', () => {
     await vendorItemPage.enterVendorItemName(testNames.vendorItem);
     await vendorItemPage.selectProduct(testNames.product);
     await vendorItemPage.clickAddPackagingOption();
-    await vendorItemPage.fillPackagingDetails('1 Case', '1', 'Case', '80');
+    await vendorItemPage.fillPackagingDetails('1 Case', '1', 'Case', '75');
     await vendorItemPage.clickSave();
     await vendorItemPage.verifyVendorItemCreated(testNames.vendorItem);
     results['Add Vendor Item'] = 'passed';
   });
 
-  // --- Recipe Add/Update Check ---
-
-  test('Add new menu item', async () => {
+  test('Add new menu item with ingredient', async () => {
     await menuItemsPage.navigateToMenuItems();
     await menuItemsPage.verifyMenuItemsPageLoaded();
     await menuItemsPage.openAddMenuItemForm();
     await menuItemsPage.fillMenuItemDetails(testNames.recipe, testNames.recipeTypeMenu, '1', 'case');
+    await menuItemsPage.addIngredient(testNames.product, '1', 'case');
     await menuItemsPage.clickSave();
     await menuItemsPage.verifyRedirectedToMenuItemsList();
     results['Add Menu Item'] = 'passed';
   });
 
-  test('Edit menu item - add ingredient', async () => {
+  test('Verify recipe price after creation', async () => {
+    await menuItemsPage.navigateToMenuItems();
     await menuItemsPage.verifyMenuItemsPageLoaded();
-    await menuItemsPage.openMenuItemByName(testNames.recipe);
-    await menuItemsPage.openEditRecipeForm();
-    await menuItemsPage.addIngredient(testNames.product, '1', 'case');
-    await menuItemsPage.clickSave();
-    await menuItemsPage.verifyRecipeDetailPageLoaded();
-    results['Edit Menu Item'] = 'passed';
+    await menuItemsPage.searchMenuItem(testNames.recipe);
+    const cost = await menuItemsPage.getMenuItemCost(testNames.recipe);
+    expect(cost).toBe('75.00');
+    results['Verify Recipe Price'] = 'passed';
   });
 
-  // --- Recipe Price Updating Using Invoice Processing ---
+  // ==========================================
+  // Stage 3: Invoice Processing — Price Update
+  // ==========================================
 
   test('Upload invoice', async () => {
     await orderPage.navigateToOrdersList();
@@ -176,7 +197,9 @@ test.describe('Recipe Test Suite 2', () => {
     results['Reconciliation'] = 'passed';
   });
 
-  // --- Verify Status & Complete Final Review ---
+  // ==========================================
+  // Stage 4: Final Review & Price Verification
+  // ==========================================
 
   let invoiceStatus: 'in_processing' | 'closed' = 'in_processing';
 
@@ -221,242 +244,256 @@ test.describe('Recipe Test Suite 2', () => {
     for (let attempt = 1; attempt <= 5; attempt++) {
       await menuItemsPage.navigateToMenuItems();
       await menuItemsPage.verifyMenuItemsPageLoaded();
+      await menuItemsPage.searchMenuItem(testNames.recipe);
       cost = await menuItemsPage.getMenuItemCost(testNames.recipe);
       if (cost.includes('80')) break;
-      console.log(`\n⏳ Attempt ${attempt}/5: Recipe cost is $${cost}, waiting for server to update...\n`);
       await persistentPage.waitForTimeout(15000);
     }
-    if (!cost.includes('80')) {
-      console.log(`\n⚠️ Recipe cost is $${cost} — server has not updated yet. Skipping assertion.\n`);
-    } else {
-      console.log(`\n✅ Recipe price for "${testNames.recipe}" is $${cost} — price updated by closed order.\n`);
-    }
+    expect(cost).toContain('80');
     results['Verify Recipe Cost'] = 'passed';
   });
 
-  // --- Recipe Active/Deactive By Modifying Inventory ---
+  // ==========================================
+  // Stage 5: Cross-Tenant — Invoice Price Check
+  // ==========================================
 
-  test('Create an inventory count sheet', async () => {
-    await countSheetPage.navigateToInventorySetup();
-    await countSheetPage.clickAddCountSheet();
-    await countSheetPage.fillCountSheetName(testNames.countSheet);
-    await countSheetPage.clickAddRecipe();
-    await countSheetPage.searchAndSelectRecipe(testNames.recipe);
-    await countSheetPage.clickAddRecipeInModal();
-    await countSheetPage.scrollToBottomAndSave();
-    await countSheetPage.verifyCountSheetCreated(testNames.countSheet);
-    results['Create Count Sheet'] = 'passed';
-  });
-
-  test('Close inventory count', async () => {
-    await inventoryPage.navigateToInventoryCounts();
-    await inventoryPage.selectMyStoreTab();
-    await inventoryPage.selectCountSheet(testNames.countSheet);
-    await inventoryPage.setInventoryDate();
-    await inventoryPage.enterCountForRecipe(testNames.recipe, '5');
-    await inventoryPage.saveAndCloseInventory();
-    await inventoryPage.confirmClose();
-    await inventoryPage.navigateToInventoryCounts();
-    await inventoryPage.verifyInventoryClosed(testNames.countSheet);
-    results['Close Inventory'] = 'passed';
-  });
-
-  test('Update inventory count sheet', async () => {
-    await countSheetPage.navigateToInventorySetup();
-    await countSheetPage.openCountSheet(testNames.countSheet);
-    await countSheetPage.deleteRecipeFromCountSheet(testNames.recipe);
-    await countSheetPage.scrollToBottomAndSave();
-    await countSheetPage.verifyRecipeRemoved(testNames.recipe);
-    results['Update Inventory'] = 'passed';
-  });
-
-  test('Reopen closed inventory', async () => {
-    await inventoryPage.navigateToInventoryCounts();
-    await inventoryPage.selectMyStoreTab();
-    await inventoryPage.openClosedInventory(testNames.countSheet);
-    await inventoryPage.clickReopen();
-    await inventoryPage.verifyInventoryReopened(testNames.countSheet);
-    results['Reopen Inventory'] = 'passed';
-  });
-
-  test('Deactivate recipe', async () => {
-    await menuItemsPage.navigateToMenuItems();
-    await menuItemsPage.verifyMenuItemsPageLoaded();
-    await menuItemsPage.openMenuItemByName(testNames.recipe);
-    await menuItemsPage.toggleRecipeOff();
-    results['Deactivate Recipe'] = 'passed';
-  });
-
-  test('Delete saved inventory', async () => {
-    await inventoryPage.navigateToInventoryCounts();
-    await inventoryPage.selectMyStoreTab();
-    await inventoryPage.openSavedInventory(testNames.countSheet);
-    await inventoryPage.clickEdit();
-    await inventoryPage.clickDeleteInventory();
-    await inventoryPage.verifyInventoryDeleted(testNames.countSheet);
-    results['Delete Inventory'] = 'passed';
-  });
-
-  test('Deactivate recipe after inventory delete', async () => {
-    await menuItemsPage.navigateToMenuItems();
-    await menuItemsPage.verifyMenuItemsPageLoaded();
-    await menuItemsPage.openMenuItemByName(testNames.recipe);
-    const result = await menuItemsPage.toggleRecipeOff();
-    expect(result).toBe('deactivated');
-    await menuItemsPage.verifyRecipeDisabled();
-    results['Deactivate Recipe After Delete Inventory'] = 'passed';
-  });
-
-  // --- Recipe Active/Deactive Same Company Concept Tenant Check ---
-
-  test('Add new product 2', async () => {
-    await productPage.navigateViaLeftNav();
-    await productPage.verifyProductsPageLoaded();
-    await productPage.clickAddProduct();
-    await productPage.enterProductName(testNames.product2);
-    await productPage.selectCategory('Cleaning Supplies');
-    await productPage.selectUnit('Case');
-    await productPage.clickSave();
-    await productPage.verifyProductCreated(testNames.product2);
-    results['Add Product 2'] = 'passed';
-  });
-
-  test('Add new menu item 2', async () => {
-    await menuItemsPage.navigateToMenuItems();
-    await menuItemsPage.verifyMenuItemsPageLoaded();
-    await menuItemsPage.openAddMenuItemForm();
-    await menuItemsPage.fillMenuItemDetails(testNames.recipe2, testNames.recipeTypeMenu, '1', 'case');
-    await menuItemsPage.addIngredient(testNames.product2, '1', 'case');
-    await menuItemsPage.clickSave();
-    await menuItemsPage.verifyRedirectedToMenuItemsList();
-    results['Add Menu Item 2'] = 'passed';
-  });
-
-  test('Create an inventory count sheet 2', async () => {
-    await countSheetPage.navigateToInventorySetup();
-    await countSheetPage.clickAddCountSheet();
-    await countSheetPage.fillCountSheetName(testNames.countSheet2);
-    await countSheetPage.clickAddRecipe();
-    await countSheetPage.searchAndSelectRecipe(testNames.recipe2);
-    await countSheetPage.clickAddRecipeInModal();
-    await countSheetPage.scrollToBottomAndSave();
-    await countSheetPage.verifyCountSheetCreated(testNames.countSheet2);
-    results['Create Count Sheet 2'] = 'passed';
-  });
-
-  test('Save and exit inventory count 2', async () => {
-    await inventoryPage.navigateToInventoryCounts();
-    await inventoryPage.selectMyStoreTab();
-    await inventoryPage.selectCountSheet(testNames.countSheet2);
-    await inventoryPage.setInventoryDate();
-    await inventoryPage.enterCountForRecipe(testNames.recipe2, '5');
-    await inventoryPage.saveAndExitInventory();
-    await inventoryPage.verifyInventoryIsCreated(testNames.countSheet2);
-    results['Close Inventory 2'] = 'passed';
-  });
-
-  test('Switch tenant to Wasabi Natick', async () => {
+  test('Switch tenant to Wasabi Natick to verify old price', async () => {
     await menuItemsPage.switchTenant('Wasabi Natick');
-    results['Switch Tenant'] = 'passed';
+    results['Switch Tenant To Natick For Price Check'] = 'passed';
   });
 
-  test('Verify recipe in use cannot be deactivated', async () => {
+  test('Verify recipe shows old price in Wasabi Natick', async () => {
     await menuItemsPage.navigateToMenuItems();
     await menuItemsPage.verifyMenuItemsPageLoaded();
-    await menuItemsPage.openMenuItemByName(testNames.recipe2);
-    const result = await menuItemsPage.toggleRecipeOff();
-    expect(result).toBe('in_use');
-    results['Deactivate Recipe In Use'] = 'passed';
+    await menuItemsPage.searchMenuItem(testNames.recipe);
+    const cost = await menuItemsPage.getMenuItemCost(testNames.recipe);
+    expect(cost).toBe('75.00');
+    results['Verify Old Price In Natick'] = 'passed';
   });
 
-  test('Switch tenant back to Wasabi Tysons', async () => {
+  test('Switch tenant back to Wasabi Tysons after price check', async () => {
     await menuItemsPage.switchTenant('Wasabi Tysons');
-    results['Switch Tenant Back'] = 'passed';
+    results['Switch Tenant Back After Price Check'] = 'passed';
   });
 
-  // --- Recipe Active/Deactive Different Company Concept Tenant Check ---
+  // ==========================================
+  // Stage 6: UoM Products (Kilogram)
+  // ==========================================
 
-  test('Add new tenant', async () => {
-    await restaurantUnitPage.navigateViaLeftNav();
-    await restaurantUnitPage.verifyRestaurantUnitsPageLoaded();
-    await restaurantUnitPage.clickBulkAddRestaurant();
-    await restaurantUnitPage.clickCantFindCompanyLink();
-    await restaurantUnitPage.selectConcept('Wasabi');
-    await restaurantUnitPage.selectCompany('Mid-States Management Group');
-    await restaurantUnitPage.checkCrossUnitReporting();
-    await restaurantUnitPage.enterRestaurantUnitName(testNames.tenant);
-    await restaurantUnitPage.selectState('Alabama');
-    await restaurantUnitPage.enterZipCode('12345');
-    await restaurantUnitPage.selectPOS('-- None --');
-    await restaurantUnitPage.selectAccounting('-- None --');
-    await restaurantUnitPage.enterSubscription('12');
-    await restaurantUnitPage.scrollToBottomAndSave();
-    await restaurantUnitPage.verifyTenantCreated();
-    results['Add Tenant'] = 'passed';
-  });
-
-  test('Add new product 3', async () => {
+  test('Add UoM product 1 with price $10', async () => {
     await productPage.navigateViaLeftNav();
     await productPage.verifyProductsPageLoaded();
     await productPage.clickAddProduct();
-    await productPage.enterProductName(testNames.product3);
+    await productPage.enterProductName(testNames.uomProduct1);
     await productPage.selectCategory('Cleaning Supplies');
-    await productPage.selectUnit('Case');
+    await productPage.selectUnit('Kilogram');
+    await productPage.setProductPrice('10');
     await productPage.clickSave();
-    await productPage.verifyProductCreated(testNames.product3);
-    results['Add Product 3'] = 'passed';
+    await productPage.verifyProductCreated(testNames.uomProduct1);
+    results['Add UoM Product 1'] = 'passed';
   });
 
-  test('Add new menu item 3', async () => {
+  test('Add UoM product 2 with price $20', async () => {
+    await productPage.navigateViaLeftNav();
+    await productPage.verifyProductsPageLoaded();
+    await productPage.clickAddProduct();
+    await productPage.enterProductName(testNames.uomProduct2);
+    await productPage.selectCategory('Cleaning Supplies');
+    await productPage.selectUnit('Kilogram');
+    await productPage.setProductPrice('20');
+    await productPage.clickSave();
+    await productPage.verifyProductCreated(testNames.uomProduct2);
+    results['Add UoM Product 2'] = 'passed';
+  });
+
+  test('Add UoM product 3 with price $30', async () => {
+    await productPage.navigateViaLeftNav();
+    await productPage.verifyProductsPageLoaded();
+    await productPage.clickAddProduct();
+    await productPage.enterProductName(testNames.uomProduct3);
+    await productPage.selectCategory('Cleaning Supplies');
+    await productPage.selectUnit('Kilogram');
+    await productPage.setProductPrice('30');
+    await productPage.clickSave();
+    await productPage.verifyProductCreated(testNames.uomProduct3);
+    results['Add UoM Product 3'] = 'passed';
+  });
+
+  // ==========================================
+  // Stage 7: UoM Recipe — Create & Verify
+  // ==========================================
+
+  test('Create UoM recipe with 3 kilogram products', async () => {
     await menuItemsPage.navigateToMenuItems();
     await menuItemsPage.verifyMenuItemsPageLoaded();
     await menuItemsPage.openAddMenuItemForm();
-    await menuItemsPage.fillMenuItemDetails(testNames.recipe3, testNames.recipeTypeMenu, '1', 'case');
-    await menuItemsPage.addIngredient(testNames.product3, '1', 'case');
+    await menuItemsPage.fillMenuItemDetails(testNames.uomRecipe, testNames.recipeTypeMenu, '1', 'kilogram');
+    await menuItemsPage.addIngredient(testNames.uomProduct1, '1', 'kilogram');
+    await menuItemsPage.clickAddIngredient();
+    await menuItemsPage.addIngredient(testNames.uomProduct2, '1', 'kilogram');
+    await menuItemsPage.clickAddIngredient();
+    await menuItemsPage.addIngredient(testNames.uomProduct3, '1', 'kilogram');
     await menuItemsPage.clickSave();
     await menuItemsPage.verifyRedirectedToMenuItemsList();
-    results['Add Menu Item 3'] = 'passed';
+    results['Add UoM Recipe'] = 'passed';
   });
 
-  test('Create an inventory count sheet 3', async () => {
-    await countSheetPage.navigateToInventorySetup();
-    await countSheetPage.clickAddCountSheet();
-    await countSheetPage.fillCountSheetName(testNames.countSheet3);
-    await countSheetPage.clickAddRecipe();
-    await countSheetPage.searchAndSelectRecipe(testNames.recipe3);
-    await countSheetPage.clickAddRecipeInModal();
-    await countSheetPage.scrollToBottomAndSave();
-    await countSheetPage.verifyCountSheetCreated(testNames.countSheet3);
-    results['Create Count Sheet 3'] = 'passed';
-  });
-
-  test('Save and exit inventory count 3', async () => {
-    await inventoryPage.navigateToInventoryCounts();
-    await inventoryPage.selectMyStoreTab();
-    await inventoryPage.selectCountSheet(testNames.countSheet3);
-    await inventoryPage.setInventoryDate();
-    await inventoryPage.enterCountForRecipe(testNames.recipe3, '5');
-    await inventoryPage.saveAndExitInventory();
-    await inventoryPage.verifyInventoryIsCreated(testNames.countSheet3);
-    results['Save and Exit Inventory 3'] = 'passed';
-  });
-
-  test('Switch tenant to new tenant', async () => {
-    await menuItemsPage.switchTenant(testNames.tenant);
-    results['Switch Tenant To New'] = 'passed';
-  });
-
-  test('Verify recipe in use cannot be deactivated in new tenant', async () => {
+  test('Verify UoM recipe price on list page', async () => {
     await menuItemsPage.navigateToMenuItems();
     await menuItemsPage.verifyMenuItemsPageLoaded();
-    await menuItemsPage.openMenuItemByName(testNames.recipe3);
-    const result = await menuItemsPage.toggleRecipeOff();
-    expect(result).toBe('in_use');
-    results['Deactivate Recipe In Use 2'] = 'passed';
+    await menuItemsPage.searchMenuItem(testNames.uomRecipe);
+    const cost = await menuItemsPage.getMenuItemCost(testNames.uomRecipe);
+    expect(cost).toBe('60.00');
+    results['Verify UoM Recipe Price List'] = 'passed';
   });
 
-  test('Switch tenant back to Wasabi Tysons after new tenant', async () => {
+  test('Verify UoM recipe ingredient total on detail page', async () => {
+    await menuItemsPage.navigateToMenuItems();
+    await menuItemsPage.verifyMenuItemsPageLoaded();
+    await menuItemsPage.searchMenuItem(testNames.uomRecipe);
+    await menuItemsPage.openMenuItemByName(testNames.uomRecipe);
+    const total = await menuItemsPage.getDetailPageIngredientTotal();
+    expect(total).toBe('60.00');
+    results['Verify UoM Recipe Ingredient Total'] = 'passed';
+  });
+
+  // ==========================================
+  // Stage 8: UoM SubRecipe — Create & Verify
+  // ==========================================
+
+  test('Create UoM sub-recipe using UoM recipe as ingredient', async () => {
+    await menuItemsPage.navigateToMenuItems();
+    await menuItemsPage.verifyMenuItemsPageLoaded();
+    await menuItemsPage.openAddMenuItemForm();
+    await menuItemsPage.fillMenuItemDetails(testNames.uomSubRecipe, testNames.recipeTypeMenu, '1', 'kilogram');
+    await menuItemsPage.addIngredient(testNames.uomRecipe, '1', 'kilogram');
+    await menuItemsPage.clickSave();
+    await menuItemsPage.verifyRedirectedToMenuItemsList();
+    results['Add UoM SubRecipe'] = 'passed';
+  });
+
+  test('Verify UoM sub-recipe price on list page', async () => {
+    await menuItemsPage.navigateToMenuItems();
+    await menuItemsPage.verifyMenuItemsPageLoaded();
+    await menuItemsPage.searchMenuItem(testNames.uomSubRecipe);
+    const cost = await menuItemsPage.getMenuItemCost(testNames.uomSubRecipe);
+    expect(cost).toBe('60.00');
+    results['Verify UoM SubRecipe Price List'] = 'passed';
+  });
+
+  test('Verify UoM sub-recipe ingredient total on detail page', async () => {
+    await menuItemsPage.navigateToMenuItems();
+    await menuItemsPage.verifyMenuItemsPageLoaded();
+    await menuItemsPage.searchMenuItem(testNames.uomSubRecipe);
+    await menuItemsPage.openMenuItemByName(testNames.uomSubRecipe);
+    const total = await menuItemsPage.getDetailPageIngredientTotal();
+    expect(total).toBe('60.00');
+    results['Verify UoM SubRecipe Ingredient Total'] = 'passed';
+  });
+
+  // ==========================================
+  // Stage 9: Cross-Tenant — UoM Before Unit Change
+  // ==========================================
+
+  test('Switch to Wasabi Natick', async () => {
+    await menuItemsPage.navigateToMenuItems();
+    await menuItemsPage.switchTenant('Wasabi Natick');
+    results['Switch To Wasabi Natick'] = 'passed';
+  });
+
+  test('Verify UoM recipe price in Wasabi Natick', async () => {
+    await menuItemsPage.navigateToMenuItems();
+    await menuItemsPage.verifyMenuItemsPageLoaded();
+    await menuItemsPage.searchMenuItem(testNames.uomRecipe);
+    const cost = await menuItemsPage.getMenuItemCost(testNames.uomRecipe);
+    expect(cost).toBe('60.00');
+    results['Verify UoM Recipe Price In Natick'] = 'passed';
+  });
+
+  test('Verify UoM recipe ingredient total in Wasabi Natick', async () => {
+    await menuItemsPage.navigateToMenuItems();
+    await menuItemsPage.verifyMenuItemsPageLoaded();
+    await menuItemsPage.searchMenuItem(testNames.uomRecipe);
+    await menuItemsPage.openMenuItemByName(testNames.uomRecipe);
+    const total = await menuItemsPage.getDetailPageIngredientTotal();
+    expect(total).toBe('60.00');
+    results['Verify UoM Recipe Ingredient Total In Natick'] = 'passed';
+  });
+
+  test('Switch back to Wasabi Tysons', async () => {
+    await menuItemsPage.navigateToMenuItems();
     await menuItemsPage.switchTenant('Wasabi Tysons');
-    results['Switch Tenant Back 2'] = 'passed';
+    results['Switch Back To Wasabi Tysons'] = 'passed';
+  });
+
+  // ==========================================
+  // Stage 10: Change UoM Product 1 — Kilogram to Pound
+  // ==========================================
+
+  test('Change UoM product 1 unit from Kilogram to Pound', async () => {
+    await productPage.navigateViaLeftNav();
+    await productPage.verifyProductsPageLoaded();
+    await productPage.searchProduct(testNames.uomProduct1);
+    await productPage.openProductByName(testNames.uomProduct1);
+    await productPage.clickEditProduct();
+    await productPage.editUsedProductUnit('Pound');
+    await productPage.scrollToBottomAndSave();
+    results['Change UoM Product 1 Unit To Pound'] = 'passed';
+  });
+
+  // ==========================================
+  // Stage 11: Verify Prices After Unit Change (Tysons)
+  // ==========================================
+
+  test('Verify UoM recipe price changed after unit change', async () => {
+    await menuItemsPage.navigateToMenuItems();
+    await menuItemsPage.verifyMenuItemsPageLoaded();
+    await menuItemsPage.searchMenuItem(testNames.uomRecipe);
+    const cost = await menuItemsPage.getMenuItemCost(testNames.uomRecipe);
+    expect(cost).toBe('72.05');
+    results['Verify UoM Recipe Price After Unit Change'] = 'passed';
+  });
+
+  test('Verify UoM sub-recipe price changed after unit change', async () => {
+    await menuItemsPage.navigateToMenuItems();
+    await menuItemsPage.verifyMenuItemsPageLoaded();
+    await menuItemsPage.searchMenuItem(testNames.uomSubRecipe);
+    const cost = await menuItemsPage.getMenuItemCost(testNames.uomSubRecipe);
+    expect(cost).toBe('72.05');
+    results['Verify UoM SubRecipe Price After Unit Change'] = 'passed';
+  });
+
+  // ==========================================
+  // Stage 12: Cross-Tenant — UoM After Unit Change
+  // ==========================================
+
+  test('Switch to Wasabi Natick after unit change', async () => {
+    await menuItemsPage.navigateToMenuItems();
+    await menuItemsPage.switchTenant('Wasabi Natick');
+    results['Switch To Natick After Unit Change'] = 'passed';
+  });
+
+  test('Verify UoM recipe price in Natick after unit change', async () => {
+    await menuItemsPage.navigateToMenuItems();
+    await menuItemsPage.verifyMenuItemsPageLoaded();
+    await menuItemsPage.searchMenuItem(testNames.uomRecipe);
+    const cost = await menuItemsPage.getMenuItemCost(testNames.uomRecipe);
+    expect(cost).toBe('72.05');
+    results['Verify UoM Recipe Price In Natick After Unit Change'] = 'passed';
+  });
+
+  test('Verify UoM sub-recipe price in Natick after unit change', async () => {
+    await menuItemsPage.navigateToMenuItems();
+    await menuItemsPage.verifyMenuItemsPageLoaded();
+    await menuItemsPage.searchMenuItem(testNames.uomSubRecipe);
+    const cost = await menuItemsPage.getMenuItemCost(testNames.uomSubRecipe);
+    expect(cost).toBe('72.05');
+    results['Verify UoM SubRecipe Price In Natick After Unit Change'] = 'passed';
+  });
+
+  test('Switch back to Wasabi Tysons after unit change', async () => {
+    await menuItemsPage.navigateToMenuItems();
+    await menuItemsPage.switchTenant('Wasabi Tysons');
+    results['Switch Back To Tysons After Unit Change'] = 'passed';
   });
 });

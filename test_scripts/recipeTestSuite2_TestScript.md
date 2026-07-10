@@ -7,7 +7,7 @@
 | **Spec File**      | `tests/recipes/recipeTestSuite2.spec.ts`           |
 | **Run Command**    | `npm run test:recipe2`                             |
 | **Execution Mode** | Serial                                             |
-| **Tenant**         | Wasabi Tysons                                      |
+| **Tenant**         | Wasabi Tysons (primary), Wasabi Natick (cross-tenant verification) |
 | **Environment**    | DEV (`https://me-63384.dev.marginedge.com`)        |
 
 ---
@@ -15,30 +15,24 @@
 ## Prerequisites
 
 - Access to the DEV environment with the `accountmanager` user account
-- A test invoice image file available at the configured path
-- The vendor **Arrow** must exist in the system
 - The tenants **Wasabi Tysons** and **Wasabi Natick** must be available
-- The concept **Wasabi** and company **Mid-States Management Group** must exist (for tenant creation)
-- A **Menu Recipe Type** must already exist (created by Recipe Test Suite 1)
+- Recipe Test Suite 1 does **not** need to run first; this suite creates its own recipe type, products, and vendor items
 
 ---
 
 ## Test Data
 
-| Entity           | Naming Convention                         |
-|------------------|-------------------------------------------|
-| Product 1        | `Automated Product <TEST_RUN_ID>`         |
-| Product 2        | `Automated Product2 <TEST_RUN_ID>`        |
-| Product 3        | `Automated Product3 <TEST_RUN_ID>`        |
-| Vendor Item      | `Automated Item <TEST_RUN_ID>`            |
-| Recipe 1         | `Automated Recipe <TEST_RUN_ID>`          |
-| Recipe 2         | `Automated Recipe2 <TEST_RUN_ID>`         |
-| Recipe 3         | `Automated Recipe3 <TEST_RUN_ID>`         |
-| Count Sheet 1    | `Automated Countsheet <TEST_RUN_ID>`      |
-| Count Sheet 2    | `Automated Countsheet2 <TEST_RUN_ID>`     |
-| Count Sheet 3    | `Automated Countsheet3 <TEST_RUN_ID>`     |
-| Tenant           | `Automated Tenant <TEST_RUN_ID>`          |
-| Invoice Number   | Random 6-digit number (auto-generated)    |
+| Entity             | Naming Convention                  | Unit     | Price |
+|--------------------|------------------------------------|----------|-------|
+| Recipe Type Menu   | `Menu Type <TEST_RUN_ID>`          | —        | —     |
+| Product            | `Automated Product <TEST_RUN_ID>`  | Case     | $75   |
+| Vendor Item        | `Automated VendorItem <TEST_RUN_ID>` | Case   | $75   |
+| Recipe             | `Automated Recipe <TEST_RUN_ID>`   | Case     | —     |
+| UoM Product 1      | `UoM Product1 <TEST_RUN_ID>`      | Kilogram | $10   |
+| UoM Product 2      | `UoM Product2 <TEST_RUN_ID>`      | Kilogram | $20   |
+| UoM Product 3      | `UoM Product3 <TEST_RUN_ID>`      | Kilogram | $30   |
+| UoM Recipe         | `UoM Recipe <TEST_RUN_ID>`        | Kilogram | —     |
+| UoM Sub-Recipe     | `UoM SubRecipe <TEST_RUN_ID>`     | Kilogram | —     |
 
 > `TEST_RUN_ID` is a shared timestamp generated during global setup to ensure test isolation.
 
@@ -46,532 +40,249 @@
 
 ## Test Steps
 
-### Stage 1: Add Product
+### Stage 1: Switch Tenant and Add Recipe Type
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 1.1 | Navigate to base URL | Home page loads |
-| 1.2 | Click **Products** in the left navigation | Products submenu expands |
-| 1.3 | Click **View All Products** | Products list page loads |
-| 1.4 | Verify the URL contains `/product` and the search input is visible | Products page is confirmed loaded |
-| 1.5 | Click **Add Product** | Add Product form opens |
-| 1.6 | Click the product name selector, type `Automated Product <RUN_ID>`, and select the matching option | Product name is entered |
-| 1.7 | Click the **Category** autocomplete, type **"Cleaning Supplies"**, and select the option | Category is set |
-| 1.8 | In the **Report Unit** dropdown, select **"Case"** | Unit is set |
-| 1.9 | Click **Save** | Product is saved |
-| 1.10 | Navigate back to Products list, click **All stores** tab, and search for the created product | Product appears in the list |
+| 1.1 | Navigate to Menu Items and switch tenant to **Wasabi Tysons** | Tenant is set to Wasabi Tysons |
+| 1.2 | Navigate to Recipe Setup page (`/#/recipeSetup`) | Recipe Setup page loads |
+| 1.3 | Click **Manage Recipe Types** | Recipe Types management page loads |
+| 1.4 | Add a new Recipe Type with name `Menu Type <RUN_ID>` and category **"Menu Items"** | Recipe type is saved |
 
 ---
 
-### Stage 2: Add Vendor Item
+### Stage 2: Add Product and Vendor Item
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 2.1 | Navigate to base URL | Home page loads |
-| 2.2 | Click **Vendors** in the left navigation | Vendors submenu expands |
-| 2.3 | Click **Vendor Items** | Vendor Items list page loads |
-| 2.4 | Verify the URL contains `/vendorProduct` | Page is confirmed loaded |
-| 2.5 | Click **Add a new Vendor Item** | Vendor Item creation form opens |
-| 2.6 | In the vendor selector, search and select **"Arrow"** | Vendor is set |
-| 2.7 | Enter the vendor item name `Automated Item <RUN_ID>` | Name is filled |
-| 2.8 | In the product selector, search and select the product created in Stage 1 | Product is linked |
-| 2.9 | Click **Add Packaging Option** | A new packaging row appears |
-| 2.10 | Fill packaging: Packaging = `1 Case`, Quantity = `1`, Unit = `Case`, Price = `80` | Packaging row is populated |
-| 2.11 | Click **Save** | Vendor item is saved |
-| 2.12 | Navigate back to Vendor Items list and search for the created item | Vendor item appears in the list |
+| 2.1 | Navigate to Products via left nav | Products list loads |
+| 2.2 | Click **Add Product** | Add Product form opens |
+| 2.3 | Enter product name `Automated Product <RUN_ID>`, category **"Cleaning Supplies"**, unit **"Case"**, price **75** | Fields are filled |
+| 2.4 | Click **Save** and verify product appears in the list | Product created with price $75 |
+| 2.5 | Navigate to Vendor Items via left nav | Vendor Items list loads |
+| 2.6 | Click **Add Vendor Item** | Add Vendor Item form opens |
+| 2.7 | Select vendor **"Arrow"** | Vendor is set |
+| 2.8 | Enter vendor item name `Automated VendorItem <RUN_ID>` | Name is filled |
+| 2.9 | Select product `Automated Product <RUN_ID>` | Product is linked |
+| 2.10 | Click **Add Packaging Option**, fill details: **1 Case**, qty **1**, unit **Case**, price **75** | Packaging is set |
+| 2.11 | Click **Save** and verify vendor item appears in the list | Vendor item created |
 
 ---
 
-### Stage 3: Add Menu Item (Recipe 1)
+### Stage 3: Add Recipe and Verify Price
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
 | 3.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
-| 3.2 | Verify the URL contains `menuItem` and the **Menu Items** heading is visible | Page is confirmed loaded |
-| 3.3 | Click **Add Menu Item** | Add Menu Item form opens |
-| 3.4 | Enter the name `Automated Recipe <RUN_ID>` in the **Name** field | Name is filled |
-| 3.5 | Click the **Recipe Type** dropdown, type `Menu Type <RUN_ID>`, and select the matching option | Recipe type is set |
-| 3.6 | Enter **1** in the **Quantity** field | Quantity is set |
-| 3.7 | Click the **Unit** dropdown, type **"case"**, and select the matching option | Unit is set |
-| 3.8 | Click **Save** | Menu item is saved |
-| 3.9 | Verify the page redirects to the Menu Items list (`/#/menuItem`) with title "Menu Items" | Redirect is confirmed |
+| 3.2 | Click **Add Menu Item** | Add form opens |
+| 3.3 | Fill details: Name = `Automated Recipe <RUN_ID>`, Type = `Menu Type <RUN_ID>`, Quantity = **1**, Unit = **case** | Fields are filled |
+| 3.4 | Add ingredient: `Automated Product <RUN_ID>`, Quantity = **1**, Unit = **case** | Ingredient added |
+| 3.5 | Click **Save** | Recipe is saved |
+| 3.6 | Verify redirect to Menu Items list | Redirect confirmed |
+| 3.7 | Search for `Automated Recipe <RUN_ID>` in Menu Items | Recipe row appears |
+| 3.8 | Verify the cost column shows **$75.00** | Initial cost is correct |
 
 ---
 
-### Stage 4: Edit Menu Item - Add Ingredient
+### Stage 4: Invoice Processing (Upload, Review, Reconciliation)
+
+> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
+> **Purpose:** Update recipe price via invoice processing with a new price of $80.
+
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 4.1 | Navigate to Orders list | Orders list loads |
+| 4.2 | Clear search input, upload invoice image | Invoice is uploaded |
+| 4.3 | Dismiss upload status modal | Modal closes |
+| 4.4 | End preprocessing | Preprocessing completes |
+| 4.5 | Navigate to Orders list | Orders list loads |
+| 4.6 | Verify invoice status is **"In Processing"** | Status is correct |
+| 4.7 | Open the first In Processing order | Order detail opens |
+| 4.8 | Select vendor **"Arrow"**, generate and fill invoice number | Vendor and invoice number set |
+| 4.9 | Fill invoice date with today | Date is set |
+| 4.10 | Dismiss remittance address if present | Address modal handled |
+| 4.11 | Fill verified total with **80** | Total is set |
+| 4.12 | Set handwriting to **No** | Handwriting flag set |
+| 4.13 | Mark initial review complete, save and complete | Initial review done |
+| 4.14 | Navigate to Orders, search and open the order by invoice number | Order reopens |
+| 4.15 | Wait for lock and process invoice | Invoice is locked |
+| 4.16 | Select vendor **"Arrow"**, fill existing invoice number | Fields set |
+| 4.17 | Fill invoice date, dismiss remittance address if present | Date set |
+| 4.18 | Add existing vendor line item `Automated VendorItem <RUN_ID>` | Line item added |
+| 4.19 | Set handwriting to **No** | Handwriting flag set |
+| 4.20 | Mark reconciliation complete, save and complete | Reconciliation done |
+| 4.21 | Click **Verified** in the modal | Verified |
+
+---
+
+### Stage 5: Final Review and Verify Updated Price
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 4.1 | Verify Menu Items page is loaded | Page is ready |
-| 4.2 | Click on the menu item cell matching `Automated Recipe <RUN_ID>` | Recipe detail page opens (URL contains `/recipe/<id>`) |
-| 4.3 | Click **Edit Recipe** | Edit recipe form opens (URL contains `/recipe/<id>/edit`) |
-| 4.4 | In the ingredient row, click the **"Type to see options"** input and type the product name from Stage 1 | Matching option appears |
-| 4.5 | Select the product from the dropdown | Product is added as ingredient |
-| 4.6 | Enter **1** in the ingredient **Quantity** field | Quantity is set |
-| 4.7 | Click the **Unit** field, type **"case"**, and select the matching option | Unit is set |
-| 4.8 | If a **"how many"** conversion modal appears: enter **1**, select a unit from the combobox, and click **Save** | Conversion is handled |
-| 4.9 | Click **Save** | Recipe is saved |
-| 4.10 | Verify the page shows the Recipe detail view (URL contains `/recipe/<id>?category=MENU`, title is "Recipe") | Recipe detail page is confirmed |
+| 5.1 | Navigate to Orders, search for the invoice | Order row appears |
+| 5.2 | Check invoice status — if **"In Processing"**, proceed; if **"Closed"**, skip final review | Status determined |
+| 5.3 | If In Processing: open order, mark reviewed for close, save and complete final review | Final review done |
+| 5.4 | Click **Verified** in the modal | Verified |
+| 5.5 | Navigate to Products, search for `Automated Product <RUN_ID>` | Product row appears |
+| 5.6 | Open product, click **Edit Product**, scroll to bottom and **Save** | Product re-saved to trigger price update |
+| 5.7 | Navigate to Menu Items, search for `Automated Recipe <RUN_ID>` | Recipe row appears |
+| 5.8 | Verify the cost column contains **80** (retry up to 5 times with 15s waits) | Cost updated from $75 to $80 |
 
 ---
 
-### Stage 5: Upload Invoice
-
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 5.1 | Navigate to Orders page (`/#/order/v2`) | Orders list loads |
-| 5.2 | Clear the search input | Search field is cleared |
-| 5.3 | Click **Add Invoice** dropdown, then click **Upload Invoice** | File chooser dialog opens |
-| 5.4 | Select the test invoice image file | File uploads; Upload Status modal appears |
-| 5.5 | Dismiss the Upload Status modal by clicking **Close/Done/OK** | Modal closes |
-
----
-
-### Stage 6: End Preprocessing
-
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 6.1 | Scroll to the bottom of the page | Page scrolls down |
-| 6.2 | Click **End Preprocessing** | Confirmation dialog appears |
-| 6.3 | Click **OK/Confirm** | Preprocessing ends |
-
----
-
-### Stage 7: Verify Invoice Status
-
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 7.1 | Navigate to Orders page (`/#/order/v2`) | Orders list reloads |
-| 7.2 | Verify a status cell displays **"In Processing"** | Invoice is queued for processing |
-
----
-
-### Stage 8: Complete Initial Review
-
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 8.1 | Navigate to Orders page | Orders list loads |
-| 8.2 | Click the first row with status **"In Processing"** | Order detail page opens |
-| 8.3 | In the vendor selector, search and select **"Arrow"** | Vendor is set |
-| 8.4 | Generate a random 6-digit invoice number and enter it in the invoice number field | Invoice number is filled and stored |
-| 8.5 | Click the invoice date field, then click **Today** | Date is set |
-| 8.6 | If **Vendor Remittance Address** section appears: click "No address is provided on the invoice." and "No Phone number is provided on the invoice." | Remittance section is dismissed |
-| 8.7 | Enter **80** in the verified total (spinbutton) field | Total is set |
-| 8.8 | In the handwriting dropdown, select **"No"** | Handwriting is set |
-| 8.9 | Click the checkbox: **"The initial review for this order is complete"** | Checkbox is checked |
-| 8.10 | Click **Save and Complete** | Order is saved |
-| 8.11 | If a **Verified** button appears, click it; if an **OK/Confirm** dialog appears, click it | All post-save modals are handled |
-
----
-
-### Stage 9: Complete Reconciliation
-
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 9.1 | Navigate to Orders page | Orders list loads |
-| 9.2 | Search for the invoice number (from Stage 8) and click the matching row | Order detail page opens |
-| 9.3 | If the order shows **"This invoice is currently locked for automation processes"**: click **Process Invoice** > **OK/Confirm** | Order is unlocked |
-| 9.4 | Verify the **"Reconcile Order"** heading is visible | Reconciliation form is loaded |
-| 9.5 | In the vendor selector, search and select **"Arrow"** | Vendor is set |
-| 9.6 | Enter the same invoice number from Stage 8 | Invoice number matches |
-| 9.7 | Set the invoice date to today | Date is filled |
-| 9.8 | Dismiss remittance address section if present | Section is handled |
-| 9.9 | Click **Add Line Item** | Add Line Item modal opens |
-| 9.10 | Ensure **"Existing Vendor Item"** radio is selected | Radio is active |
-| 9.11 | Search for the vendor item name (from Stage 2) and select it | Item is selected |
-| 9.12 | Enter quantity = `1`, unit price = `80` | Line item values are filled |
-| 9.13 | Click **OK**, select a packaging option if prompted, then **Save** | Line item is added |
-| 9.14 | Set the handwriting dropdown to **"No"** | Handwriting is set |
-| 9.15 | Click the checkbox: **"The reconciliation for this order is complete"** | Checkbox is checked |
-| 9.16 | Click **Save and Complete** | Order is saved |
-| 9.17 | Click the **Verified** button in the modal | Verification is confirmed |
-
----
-
-### Stage 10: Verify Invoice Status After Reconciliation
-
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 10.1 | Navigate to Orders page | Orders list loads |
-| 10.2 | Search for the invoice number | Matching order row appears |
-| 10.3 | Check if the invoice status is **"In Processing"** or **"Closed"** | Status is determined |
-| 10.4 | Store the status to determine the next workflow path | If **In Processing** → proceed to Final Review; if **Closed** → skip Final Review |
-
----
-
-### Stage 11: Complete Final Review (Conditional)
-
-> **Skipped if invoice status is "Closed"**
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 11.1 | Navigate to Orders page | Orders list loads |
-| 11.2 | Search for the invoice number and click the matching row | Order detail page opens |
-| 11.3 | Click the checkbox: **"This order has been reviewed and should be closed"** | Checkbox is checked |
-| 11.4 | Click **Save** | Order is saved |
-| 11.5 | Click the **Verified** button in the modal | Verification is confirmed |
-
----
-
-### Stage 12: Edit Product
-
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 12.1 | Navigate to Products via left nav | Products list loads |
-| 12.2 | Search for `Automated Product <RUN_ID>` | Product row appears |
-| 12.3 | Click on the product row | Product detail page opens |
-| 12.4 | Click **Edit Product** | Edit form opens |
-| 12.5 | Scroll to the bottom and click **Save** | Product is saved (triggers recipe cost recalculation) |
-| 12.6 | If an **"Affected Recipes"** modal appears: click the **Submit** button | Modal is handled |
-
----
-
-### Stage 13: Verify Recipe Cost After Order Close
-
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 13.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
-| 13.2 | Locate the row for `Automated Recipe <RUN_ID>` and read the cost column | Cost value is retrieved |
-| 13.3 | If the cost does not contain **"80"**: wait 15 seconds and retry (up to 5 attempts) | Server-side cost calculation may be delayed |
-| 13.4 | Verify the cost contains **"80"** | Recipe cost reflects the $80 unit price from the closed invoice |
-
-> **Note:** The server may take time to update the cost after the order is closed. The test retries up to 5 times with 15-second intervals.
-
----
-
-### Stage 14: Create Count Sheet
-
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 14.1 | Navigate to Inventory Setup page (`/#/inventorySetup`) | Inventory Setup page loads |
-| 14.2 | Click **Add Count Sheet** | Count sheet creation form opens |
-| 14.3 | Enter the count sheet name `Automated Countsheet <RUN_ID>` | Name is filled |
-| 14.4 | Click **Add Recipe** | Add Recipe modal opens |
-| 14.5 | Search and select `Automated Recipe <RUN_ID>` | Recipe is selected |
-| 14.6 | Click **Add Recipe** button inside the modal | Recipe is added to the count sheet |
-| 14.7 | Scroll to the bottom and click **Save** | Count sheet is saved |
-| 14.8 | Verify the count sheet appears in the **Enter a Count** dropdown | Count sheet was created |
-
----
-
-### Stage 15: Close Inventory Count
-
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 15.1 | Navigate to Inventory Counts page (`/#/inventory`) | Inventory Counts page loads |
-| 15.2 | Click the **My Store** tab | My Store inventory view loads |
-| 15.3 | Select count sheet `Automated Countsheet <RUN_ID>` from the **Enter a Count** dropdown | Count entry form opens |
-| 15.4 | Set the inventory date to today | Date is set |
-| 15.5 | Enter **5** in the count input for `Automated Recipe <RUN_ID>` | Count is entered |
-| 15.6 | Click **Save Options** > **Save and Close** | Inventory is saved and closed |
-| 15.7 | Click **OK** in the confirmation dialog | Close is confirmed |
-| 15.8 | Navigate back and verify the count sheet appears in the list | Inventory is closed |
-
----
-
-### Stage 16: Update Count Sheet - Remove Recipe
-
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 16.1 | Navigate to Inventory Setup page | Inventory Setup loads |
-| 16.2 | Click on the count sheet `Automated Countsheet <RUN_ID>` | Count sheet detail opens |
-| 16.3 | Click the **delete** button for the recipe | Confirmation may appear |
-| 16.4 | If confirmation appears, click **OK** | Deletion is confirmed |
-| 16.5 | Scroll to the bottom and click **Save** | Count sheet is saved |
-| 16.6 | Verify the recipe is no longer listed | Recipe was removed |
-
----
-
-### Stage 17: Reopen Closed Inventory
-
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 17.1 | Navigate to Inventory Counts page | Inventory Counts loads |
-| 17.2 | Click the **My Store** tab | My Store view loads |
-| 17.3 | Click on the closed inventory for `Automated Countsheet <RUN_ID>` | Inventory detail opens |
-| 17.4 | Click **Reopen** | Confirmation dialog appears |
-| 17.5 | Click **OK/Confirm** | Inventory is reopened |
-| 17.6 | Verify the count sheet shows status **"Saved"** | Inventory was reopened |
-
----
-
-### Stage 18: Deactivate Recipe
-
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 18.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
-| 18.2 | Click on `Automated Recipe <RUN_ID>` | Recipe detail page opens |
-| 18.3 | Click the **activation toggle** | Recipe is toggled off |
-| 18.4 | If a **"Recipe In Use"** modal appears: dismiss it | Deactivation may be blocked |
-
----
-
-### Stage 19: Delete Saved Inventory
-
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 19.1 | Navigate to Inventory Counts page | Inventory Counts loads |
-| 19.2 | Click the **My Store** tab | My Store view loads |
-| 19.3 | Click on the saved inventory for `Automated Countsheet <RUN_ID>` | Inventory detail opens |
-| 19.4 | Click **Edit** | Edit mode is enabled |
-| 19.5 | Click the red **Delete** button | Delete confirmation appears |
-| 19.6 | Click **Delete** in the confirmation modal | Inventory is deleted |
-| 19.7 | Verify the count sheet row is no longer visible | Inventory was deleted |
-
----
-
-### Stage 20: Deactivate Recipe After Inventory Delete
-
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 20.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
-| 20.2 | Click on `Automated Recipe <RUN_ID>` | Recipe detail page opens |
-| 20.3 | Click the **activation toggle** | Recipe toggles off |
-| 20.4 | Verify no "Recipe In Use" modal appears (returns **"deactivated"**) | Recipe is no longer referenced |
-| 20.5 | Verify the **"Recipe Is Disabled"** banner is visible | Recipe is confirmed disabled |
-
----
-
-### Stage 21: Add Product 2
-
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 21.1 | Navigate to Products via left nav | Products list loads |
-| 21.2 | Click **Add Product** | Add Product form opens |
-| 21.3 | Enter product name `Automated Product2 <RUN_ID>` | Name is filled |
-| 21.4 | Select category **"Cleaning Supplies"**, unit **"Case"** | Fields set |
-| 21.5 | Click **Save** | Product is saved |
-| 21.6 | Verify the product appears in the list | Product 2 is created |
-
----
-
-### Stage 22: Add Menu Item 2 (Recipe 2) with Ingredient
-
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 22.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
-| 22.2 | Click **Add Menu Item** | Add form opens |
-| 22.3 | Fill details: Name = `Automated Recipe2 <RUN_ID>`, Type = `Menu Type <RUN_ID>`, Quantity = **1**, Unit = **case** | Fields are filled |
-| 22.4 | Add ingredient: `Automated Product2 <RUN_ID>`, Quantity = **1**, Unit = **case** | Ingredient is added |
-| 22.5 | Click **Save** | Menu item is saved |
-| 22.6 | Verify redirect to Menu Items list | Recipe 2 is created |
-
----
-
-### Stage 23: Create Count Sheet 2
-
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 23.1 | Navigate to Inventory Setup page | Inventory Setup loads |
-| 23.2 | Click **Add Count Sheet** | Count sheet form opens |
-| 23.3 | Enter name `Automated Countsheet2 <RUN_ID>` | Name is filled |
-| 23.4 | Add recipe `Automated Recipe2 <RUN_ID>` | Recipe is added |
-| 23.5 | Scroll to bottom and click **Save** | Count sheet is saved |
-| 23.6 | Verify the count sheet is created | Count sheet 2 exists |
-
----
-
-### Stage 24: Save and Exit Inventory Count 2
-
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 24.1 | Navigate to Inventory Counts > **My Store** tab | My Store view loads |
-| 24.2 | Select `Automated Countsheet2 <RUN_ID>` from **Enter a Count** dropdown | Count entry form opens |
-| 24.3 | Set inventory date to today | Date is set |
-| 24.4 | Enter **5** for `Automated Recipe2 <RUN_ID>` | Count is entered |
-| 24.5 | Click **Save Options** > **Save and Exit** | Inventory is saved (not closed) |
-| 24.6 | Verify the row shows status **"Saved"** | Inventory is saved |
-
----
-
-### Stage 25: Switch Tenant to Wasabi Natick
+### Stage 6: Cross-Tenant Verification (Invoice Price)
 
 > **Logged in as:** `accountmanager`
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 25.1 | Click the **tenant dropdown** (`#unitMenu_dd`) | Tenant menu opens |
-| 25.2 | Select **"Wasabi Natick"** | Tenant switches |
+| 6.1 | Switch tenant to **Wasabi Natick** | Tenant switches |
+| 6.2 | Navigate to Menu Items, search for `Automated Recipe <RUN_ID>` | Recipe row appears |
+| 6.3 | Verify the cost column shows **$75.00** (old price — invoice price is tenant-specific) | Old price in Natick |
+| 6.4 | Switch tenant back to **Wasabi Tysons** | Tenant switches back |
 
 ---
 
-### Stage 26: Verify Recipe In Use Cannot Be Deactivated (Same Company)
+### Stage 7: Add UoM Products (Kilogram)
 
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Natick
+> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 26.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
-| 26.2 | Click on `Automated Recipe2 <RUN_ID>` | Recipe detail page opens |
-| 26.3 | Click the **activation toggle** | **"Recipe In Use"** modal appears |
-| 26.4 | Verify the toggle returns **"in_use"** | Recipe cannot be deactivated (used in active inventory at Wasabi Tysons) |
-| 26.5 | Dismiss the modal | Modal closes |
+| 7.1 | Navigate to Products via left nav | Products list loads |
+| 7.2 | Click **Add Product** | Add Product form opens |
+| 7.3 | Enter product name `UoM Product1 <RUN_ID>`, category **"Cleaning Supplies"**, unit **"Kilogram"**, price **10** | Fields are filled |
+| 7.4 | Click **Save** and verify product appears in the list | Product 1 created with price $10/kg |
+| 7.5 | Repeat steps 7.1–7.4 for `UoM Product2 <RUN_ID>` with price **20** | Product 2 created with price $20/kg |
+| 7.6 | Repeat steps 7.1–7.4 for `UoM Product3 <RUN_ID>` with price **30** | Product 3 created with price $30/kg |
 
 ---
 
-### Stage 27: Switch Tenant Back to Wasabi Tysons
+### Stage 8: Create UoM Recipe
+
+> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
+
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 8.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
+| 8.2 | Click **Add Menu Item** | Add form opens |
+| 8.3 | Fill details: Name = `UoM Recipe <RUN_ID>`, Type = `Menu Type <RUN_ID>`, Quantity = **1**, Unit = **kilogram** | Fields are filled |
+| 8.4 | Add ingredient: `UoM Product1 <RUN_ID>`, Quantity = **1**, Unit = **kilogram** | Ingredient 1 added |
+| 8.5 | Click **Add ingredient**, add `UoM Product2 <RUN_ID>`, Quantity = **1**, Unit = **kilogram** | Ingredient 2 added |
+| 8.6 | Click **Add ingredient**, add `UoM Product3 <RUN_ID>`, Quantity = **1**, Unit = **kilogram** | Ingredient 3 added |
+| 8.7 | Click **Save** | Recipe is saved |
+| 8.8 | Verify redirect to Menu Items list | Redirect confirmed |
+
+---
+
+### Stage 9: Verify UoM Recipe Price and Ingredient Total
+
+> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
+
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 9.1 | Navigate to Menu Items, search for `UoM Recipe <RUN_ID>` | Recipe row appears |
+| 9.2 | Verify the cost column shows **$60.00** ($10 + $20 + $30) | Cost is correct |
+| 9.3 | Click on the recipe to open detail page | Detail page opens |
+| 9.4 | Scroll to the bottom of the page | Bottom section is visible |
+| 9.5 | Verify the **Ingredient Total** field shows **60.00** | Ingredient total matches |
+
+---
+
+### Stage 10: Create UoM Sub-Recipe (Using Recipe as Ingredient)
+
+> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
+
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 10.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
+| 10.2 | Click **Add Menu Item** | Add form opens |
+| 10.3 | Fill details: Name = `UoM SubRecipe <RUN_ID>`, Type = `Menu Type <RUN_ID>`, Quantity = **1**, Unit = **kilogram** | Fields are filled |
+| 10.4 | Add ingredient: `UoM Recipe <RUN_ID>`, Quantity = **1**, Unit = **kilogram** | Recipe is added as ingredient |
+| 10.5 | Click **Save** | Sub-recipe is saved |
+| 10.6 | Verify redirect to Menu Items list | Redirect confirmed |
+
+---
+
+### Stage 11: Verify UoM Sub-Recipe Price and Ingredient Total
+
+> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
+
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 11.1 | Navigate to Menu Items, search for `UoM SubRecipe <RUN_ID>` | Sub-recipe row appears |
+| 11.2 | Verify the cost column shows **$60.00** | Cost is correct |
+| 11.3 | Click on the sub-recipe to open detail page | Detail page opens |
+| 11.4 | Scroll to the bottom of the page | Bottom section is visible |
+| 11.5 | Verify the **Ingredient Total** field shows **60.00** | Ingredient total matches |
+
+---
+
+### Stage 12: Cross-Tenant Verification (Natick — Before Unit Change)
 
 > **Logged in as:** `accountmanager`
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 27.1 | Click the **tenant dropdown** | Tenant menu opens |
-| 27.2 | Select **"Wasabi Tysons"** | Tenant switches back |
+| 12.1 | Switch tenant to **Wasabi Natick** | Tenant switches |
+| 12.2 | Navigate to Menu Items, search for `UoM Recipe <RUN_ID>` | Recipe row appears |
+| 12.3 | Verify the cost column shows **$60.00** | Price is same across tenants |
+| 12.4 | Click on the recipe to open detail page | Detail page opens |
+| 12.5 | Scroll to the bottom and verify **Ingredient Total** is **60.00** | Ingredient total matches Tysons |
+| 12.6 | Switch tenant back to **Wasabi Tysons** | Tenant switches back |
 
 ---
 
-### Stage 28: Add New Tenant (Cross-Company)
+### Stage 13: Change UoM Product 1 Unit from Kilogram to Pound
+
+> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
+> **Note:** Products in use by recipes require the "Edit Unit and Name" modal to change unit.
+
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 13.1 | Navigate to Products, search for `UoM Product1 <RUN_ID>` | Product row appears |
+| 13.2 | Click on the product to open detail page | Detail page opens |
+| 13.3 | Click **Edit Product** | Edit form opens |
+| 13.4 | Click **Edit Unit and Name** button | Modal opens titled "How do you want to see this product on reports?" |
+| 13.5 | Change the **Unit** dropdown from **Kilogram** to **Pound** | Unit is changed |
+| 13.6 | Click **Save** in the modal | Modal closes |
+| 13.7 | Scroll to bottom and click **Save** on the product page | Product is saved (handles "Affected Recipes" modal if it appears) |
+
+---
+
+### Stage 14: Verify Recipe Prices After Unit Change (Tysons)
 
 > **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 28.1 | Navigate to **Central** > **Restaurant Units** | Restaurant Units list loads |
-| 28.2 | Click **Bulk Add Restaurant** | Bulk add form opens |
-| 28.3 | Click **"Can't find your company?"** link | Advanced form loads |
-| 28.4 | Select concept **"Wasabi"** | Concept is set |
-| 28.5 | Select company **"Mid-States Management Group"** | Company is set (different company, same concept) |
-| 28.6 | Check **Cross Unit Reporting** checkbox | Enabled |
-| 28.7 | Enter name `Automated Tenant <RUN_ID>` | Name is filled |
-| 28.8 | Select state **"Alabama"**, enter zip **12345** | Location set |
-| 28.9 | Select POS **"-- None --"**, Accounting **"-- None --"** | Systems set |
-| 28.10 | Enter subscription **12** | Subscription set |
-| 28.11 | Scroll to bottom and click **Save**, confirm in modal | Tenant is created |
+| 14.1 | Navigate to Menu Items, search for `UoM Recipe <RUN_ID>` | Recipe row appears |
+| 14.2 | Verify the cost column shows **$72.05** (changed from $60.00 due to kg→lb conversion on Product 1) | Cost updated |
+| 14.3 | Navigate to Menu Items, search for `UoM SubRecipe <RUN_ID>` | Sub-recipe row appears |
+| 14.4 | Verify the cost column shows **$72.05** | Sub-recipe cost also updated |
 
 ---
 
-### Stage 29: Add Product 3
-
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 29.1 | Navigate to Products, click **Add Product** | Form opens |
-| 29.2 | Enter name `Automated Product3 <RUN_ID>`, category **"Cleaning Supplies"**, unit **"Case"** | Fields filled |
-| 29.3 | Click **Save** | Product 3 is created |
-
----
-
-### Stage 30: Add Menu Item 3 (Recipe 3) with Ingredient
-
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 30.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
-| 30.2 | Click **Add Menu Item** | Form opens |
-| 30.3 | Fill details: Name = `Automated Recipe3 <RUN_ID>`, Type = `Menu Type <RUN_ID>`, Quantity = **1**, Unit = **case** | Fields filled |
-| 30.4 | Add ingredient: `Automated Product3 <RUN_ID>`, Quantity = **1**, Unit = **case** | Ingredient added |
-| 30.5 | Click **Save** | Recipe 3 is created |
-
----
-
-### Stage 31: Create Count Sheet 3
-
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 31.1 | Navigate to Inventory Setup | Inventory Setup loads |
-| 31.2 | Click **Add Count Sheet**, enter name `Automated Countsheet3 <RUN_ID>` | Name filled |
-| 31.3 | Add recipe `Automated Recipe3 <RUN_ID>` | Recipe added |
-| 31.4 | Save the count sheet | Count sheet 3 is created |
-
----
-
-### Stage 32: Save and Exit Inventory Count 3
-
-> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 32.1 | Navigate to Inventory Counts > **My Store** tab | My Store view loads |
-| 32.2 | Select `Automated Countsheet3 <RUN_ID>` | Count entry form opens |
-| 32.3 | Set date to today, enter **5** for `Automated Recipe3 <RUN_ID>` | Count entered |
-| 32.4 | Click **Save and Exit** | Inventory is saved |
-
----
-
-### Stage 33: Switch Tenant to New Tenant
+### Stage 15: Cross-Tenant Verification (Natick — After Unit Change)
 
 > **Logged in as:** `accountmanager`
 
 | Step | Action | Expected Result |
 |------|--------|-----------------|
-| 33.1 | Click the **tenant dropdown** | Tenant menu opens |
-| 33.2 | Select `Automated Tenant <RUN_ID>` | Tenant switches to the new tenant |
-
----
-
-### Stage 34: Verify Recipe In Use Cannot Be Deactivated (Cross-Company)
-
-> **Logged in as:** `accountmanager` | **Tenant:** `Automated Tenant <RUN_ID>`
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 34.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
-| 34.2 | Click on `Automated Recipe3 <RUN_ID>` | Recipe detail page opens |
-| 34.3 | Click the **activation toggle** | **"Recipe In Use"** modal appears |
-| 34.4 | Verify the toggle returns **"in_use"** | Recipe cannot be deactivated (used at Wasabi Tysons under different company, same concept) |
-| 34.5 | Dismiss the modal | Modal closes |
-
----
-
-### Stage 35: Switch Tenant Back to Wasabi Tysons
-
-> **Logged in as:** `accountmanager`
-
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 35.1 | Click the **tenant dropdown** | Tenant menu opens |
-| 35.2 | Select **"Wasabi Tysons"** | Tenant switches back to the default |
+| 15.1 | Switch tenant to **Wasabi Natick** | Tenant switches |
+| 15.2 | Navigate to Menu Items, search for `UoM Recipe <RUN_ID>` | Recipe row appears |
+| 15.3 | Verify the cost column shows **$72.05** | Updated price reflected in Natick |
+| 15.4 | Navigate to Menu Items, search for `UoM SubRecipe <RUN_ID>` | Sub-recipe row appears |
+| 15.5 | Verify the cost column shows **$72.05** | Updated sub-recipe price reflected in Natick |
+| 15.6 | Switch tenant back to **Wasabi Tysons** | Tenant switches back |
 
 ---
 
@@ -581,74 +292,109 @@ The automated test tracks the following stages. Each defaults to **failed** and 
 
 | # | Stage | Status |
 |---|-------|--------|
-| 1 | Add Product | pending |
-| 2 | Add Vendor Item | pending |
-| 3 | Add Menu Item | pending |
-| 4 | Edit Menu Item | pending |
-| 5 | File Uploaded | pending |
-| 6 | End Preprocessing | pending |
-| 7 | Initial Review | pending |
-| 8 | Reconciliation | pending |
-| 9 | Final Review | pending (conditional — skipped if invoice is already Closed) |
-| 10 | Edit Product | pending |
-| 11 | Verify Recipe Cost | pending |
-| 12 | Create Count Sheet | pending |
-| 13 | Close Inventory | pending |
-| 14 | Update Inventory | pending |
-| 15 | Reopen Inventory | pending |
-| 16 | Deactivate Recipe | pending |
-| 17 | Delete Inventory | pending |
-| 18 | Deactivate Recipe After Delete Inventory | pending |
-| 19 | Add Product 2 | pending |
-| 20 | Add Menu Item 2 | pending |
-| 21 | Create Count Sheet 2 | pending |
-| 22 | Close Inventory 2 | pending |
-| 23 | Switch Tenant | pending |
-| 24 | Deactivate Recipe In Use | pending |
-| 25 | Switch Tenant Back | pending |
-| 26 | Add Tenant | pending |
-| 27 | Add Product 3 | pending |
-| 28 | Add Menu Item 3 | pending |
-| 29 | Create Count Sheet 3 | pending |
-| 30 | Save and Exit Inventory 3 | pending |
-| 31 | Switch Tenant To New | pending |
-| 32 | Deactivate Recipe In Use 2 | pending |
-| 33 | Switch Tenant Back 2 | pending |
+| 1 | Switch To Wasabi Tysons | pending |
+| 2 | Add Menu Recipe Type | pending |
+| 3 | Add Product | pending |
+| 4 | Add Vendor Item | pending |
+| 5 | Add Menu Item | pending |
+| 6 | Verify Recipe Price | pending |
+| 7 | File Uploaded | pending |
+| 8 | End Preprocessing | pending |
+| 9 | Initial Review | pending |
+| 10 | Reconciliation | pending |
+| 11 | Final Review | pending |
+| 12 | Edit Product | pending |
+| 13 | Verify Recipe Cost | pending |
+| 14 | Switch Tenant To Natick For Price Check | pending |
+| 15 | Verify Old Price In Natick | pending |
+| 16 | Switch Tenant Back After Price Check | pending |
+| 17 | Add UoM Product 1 | pending |
+| 18 | Add UoM Product 2 | pending |
+| 19 | Add UoM Product 3 | pending |
+| 20 | Add UoM Recipe | pending |
+| 21 | Verify UoM Recipe Price List | pending |
+| 22 | Verify UoM Recipe Ingredient Total | pending |
+| 23 | Add UoM SubRecipe | pending |
+| 24 | Verify UoM SubRecipe Price List | pending |
+| 25 | Verify UoM SubRecipe Ingredient Total | pending |
+| 26 | Switch To Wasabi Natick | pending |
+| 27 | Verify UoM Recipe Price In Natick | pending |
+| 28 | Verify UoM Recipe Ingredient Total In Natick | pending |
+| 29 | Switch Back To Wasabi Tysons | pending |
+| 30 | Change UoM Product 1 Unit To Pound | pending |
+| 31 | Verify UoM Recipe Price After Unit Change | pending |
+| 32 | Verify UoM SubRecipe Price After Unit Change | pending |
+| 33 | Switch To Natick After Unit Change | pending |
+| 34 | Verify UoM Recipe Price In Natick After Unit Change | pending |
+| 35 | Verify UoM SubRecipe Price In Natick After Unit Change | pending |
+| 36 | Switch Back To Tysons After Unit Change | pending |
 
 ---
 
 ## Workflow Overview
 
 ```
-accountmanager ──> Products, Vendor Items, Menu Items, Invoice Processing,
-                   Inventory Management, Tenant Management
+accountmanager ──> Recipe Types, Products, Vendor Items, Menu Items,
+                   Invoice Processing, Tenant Management
        │
-       ├──> Recipe Lifecycle (Stages 1-13)
-       │       Product ──> Vendor Item ──> Menu Item ──> Add Ingredient
-       │       ──> Invoice Upload ──> Preprocessing ──> Initial Review
-       │       ──> Reconciliation ──> Verify Status
-       │           ├── In Processing ──> Final Review
-       │           └── Closed ──> (skip Final Review)
-       │       ──> Edit Product ──> Verify Recipe Cost
+       ├──> Tenant & Recipe Type Setup (Stage 1)
+       │       Switch to Wasabi Tysons
+       │       Add Menu Recipe Type
        │
-       ├──> Inventory Lifecycle (Stages 14-20)
-       │       Create Count Sheet ──> Close Inventory ──> Update Count Sheet
-       │       ──> Reopen Inventory ──> Deactivate Recipe
-       │       ──> Delete Inventory ──> Deactivate Recipe (succeeds)
+       ├──> Product, Vendor Item & Recipe Setup (Stages 2-3)
+       │       Add Product ($75/case)
+       │       Add Vendor Item (Arrow, $75/case)
+       │       Add Recipe with product as ingredient
+       │       ──> Verify list price = $75.00
        │
-       ├──> Same Company Concept Check (Stages 21-27)
-       │       Product 2 ──> Recipe 2 ──> Count Sheet 2 ──> Save Inventory
-       │       ──> Switch to Wasabi Natick
-       │       ──> Try Deactivate Recipe 2 ──> BLOCKED (in_use)
-       │       ──> Switch Back to Wasabi Tysons
+       ├──> Invoice Processing — Price Update (Stages 4-5)
+       │       Upload invoice image
+       │       ──> End Preprocessing
+       │       ──> Initial Review (verified total = $80)
+       │       ──> Reconciliation (add vendor line item)
+       │       ──> Final Review (if status is In Processing)
+       │       ──> Edit Product (trigger price recalculation)
+       │       ──> Verify recipe cost updated to $80
        │
-       └──> Cross Company Concept Check (Stages 28-35)
-               Add New Tenant (different company, same concept)
-               ──> Product 3 ──> Recipe 3 ──> Count Sheet 3
-               ──> Save Inventory
-               ──> Switch to New Tenant
-               ──> Try Deactivate Recipe 3 ──> BLOCKED (in_use)
-               ──> Switch Back to Wasabi Tysons
+       ├──> Cross-Tenant Verification — Invoice Price (Stage 6)
+       │       Switch to Wasabi Natick
+       │       ──> Verify recipe still shows old price $75.00
+       │       Switch back to Wasabi Tysons
+       │
+       ├──> UoM Products Setup (Stage 7)
+       │       Add Product 1 ($10/kg)
+       │       Add Product 2 ($20/kg)
+       │       Add Product 3 ($30/kg)
+       │
+       ├──> UoM Recipe Creation & Verification (Stages 8-9)
+       │       Create Recipe with 3 kg ingredients
+       │       ──> Verify list price = $60.00
+       │       ──> Verify detail page Ingredient Total = 60.00
+       │
+       ├──> UoM Sub-Recipe Creation & Verification (Stages 10-11)
+       │       Create Sub-Recipe using UoM Recipe as ingredient
+       │       ──> Verify list price = $60.00
+       │       ──> Verify detail page Ingredient Total = 60.00
+       │
+       ├──> Cross-Tenant Verification Before Unit Change (Stage 12)
+       │       Switch to Wasabi Natick
+       │       ──> Verify UoM Recipe price = $60.00
+       │       ──> Verify Ingredient Total = 60.00
+       │       Switch back to Wasabi Tysons
+       │
+       ├──> UoM Unit Change (Stage 13)
+       │       Edit UoM Product 1: Kilogram → Pound
+       │       (via "Edit Unit and Name" modal)
+       │
+       ├──> Verify Updated Prices in Tysons (Stage 14)
+       │       ──> UoM Recipe price = $72.05
+       │       ──> UoM SubRecipe price = $72.05
+       │
+       └──> Cross-Tenant Verification After Unit Change (Stage 15)
+               Switch to Wasabi Natick
+               ──> UoM Recipe price = $72.05
+               ──> UoM SubRecipe price = $72.05
+               Switch back to Wasabi Tysons
 ```
 
 ---
@@ -657,8 +403,12 @@ accountmanager ──> Products, Vendor Items, Menu Items, Invoice Processing,
 
 - All tests run in **serial mode** because each stage depends on prior stages.
 - The entire suite runs under a single `accountmanager` session.
-- The `createResultsTracker` utility logs a summary table of all 33 stage outcomes in the `afterAll` hook.
+- The suite covers two main areas:
+  1. **Invoice Processing Price Update** — creating a product/vendor item/recipe, processing an invoice to change the product price from $75 to $80, and verifying the recipe cost updates. Cross-tenant check confirms Natick still shows the old $75 price.
+  2. **UoM Unit Change Price Update** — creating products with kilogram units, building recipes, changing a product's unit from kilogram to pound via the "Edit Unit and Name" modal, and verifying the recipe cost changes from $60.00 to $72.05 across both tenants.
+- The invoice status check after reconciliation handles two possible states: if the invoice auto-closes, the final review step is skipped.
+- The recipe cost verification after order close uses a retry loop (up to 5 attempts with 15s waits) to account for async price propagation.
+- Products in use by recipes cannot have their unit edited normally; the **"Edit Unit and Name"** modal must be used instead. This modal contains a `<select name="reportUnit">` dropdown.
+- The **Ingredient Total** field on the recipe detail page is accessed via `getByRole('textbox', { name: 'Ingredient Total' })`.
+- The `createResultsTracker` utility logs a summary table of all 36 stage outcomes in the `afterAll` hook.
 - The test generates a unique `TEST_RUN_ID` timestamp to prevent name collisions.
-- After reconciliation, the invoice status is checked: if **"In Processing"** the final review proceeds; if **"Closed"** the final review is skipped via `test.skip()`.
-- Recipe cost verification retries up to 5 times with 15-second intervals to allow server-side recalculation.
-- The suite tests recipe deactivation protection across three scenarios: same tenant, same-concept/same-company, and same-concept/cross-company.

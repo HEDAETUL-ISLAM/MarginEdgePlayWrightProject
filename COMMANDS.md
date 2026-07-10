@@ -36,6 +36,15 @@ npm run test:recipe2
 npx playwright test tests/recipes/recipeTestSuite2.spec.ts --headed --project=chromium
 ```
 
+## Recipe Test Suite 3
+
+```bash
+npm run test:recipe3
+```
+```bash
+npx playwright test tests/recipes/recipeTestSuite3.spec.ts --headed --project=chromium
+```
+
 ## Run Tests with Jira Reporting
 
 ```bash
