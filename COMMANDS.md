@@ -18,13 +18,22 @@ npm run test:edi-invoices
 npx playwright test tests/invoiceProcessing/ediInvoices.spec.ts --headed --project=chromium
 ```
 
-## Recipe Test Suite
+## Recipe Test Suite 1
 
 ```bash
-npm run test:recipe
+npm run test:recipe1
 ```
 ```bash
-npx playwright test tests/recipes/recipeTestSuite.spec.ts --headed --project=chromium
+npx playwright test tests/recipes/recipeTestSuite1.spec.ts --headed --project=chromium
+```
+
+## Recipe Test Suite 2
+
+```bash
+npm run test:recipe2
+```
+```bash
+npx playwright test tests/recipes/recipeTestSuite2.spec.ts --headed --project=chromium
 ```
 
 ## Run Tests with Jira Reporting

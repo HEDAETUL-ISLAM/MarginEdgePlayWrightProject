@@ -270,6 +270,36 @@ export class MenuItemsPage extends BasePage {
     return (await plateCostInput.inputValue()).trim();
   }
 
+  async clickMoreOptions() {
+    const moreOptionsButton = this.page.getByRole('button', { name: 'More Options', exact: true });
+    await moreOptionsButton.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await moreOptionsButton.click();
+    await this.page.waitForTimeout(500);
+  }
+
+  async clickCreateDuplicateRecipe() {
+    const duplicateOption = this.page.getByRole('menuitem', { name: /create duplicate recipe/i });
+    await duplicateOption.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await duplicateOption.click();
+    await this.page.waitForURL(/\/recipe\/\d+\/edit/, { timeout: TIMEOUT.long });
+    await this.waitForPageLoad();
+  }
+
+  async scrollToBottomAndSave() {
+    await this.page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await this.page.waitForTimeout(1000);
+    await this.saveButton.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await this.saveButton.click();
+    await this.page.waitForLoadState('networkidle', { timeout: TIMEOUT.long });
+  }
+
+  async getRecipeDetailName(): Promise<string> {
+    // On the recipe detail page, the name is displayed as a heading
+    const nameHeading = this.page.getByRole('heading').first();
+    await nameHeading.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    return (await nameHeading.textContent())?.trim() || '';
+  }
+
   async addMultipleMethods(methods: { text: string; filePath: string }[]) {
     const fixturesDir = path.resolve('fixtures', 'files', 'recipeMethod');
 
