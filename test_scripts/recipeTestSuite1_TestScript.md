@@ -8,7 +8,7 @@
 | **Run Command**    | `npm run test:recipe1`                             |
 | **Execution Mode** | Serial                                             |
 | **Tenant**         | Wasabi Tysons                                      |
-| **Environment**    | DEV (`https://me-63384.dev.marginedge.com`)        |
+| **Environment**    | DEV (configurable via `TEST_ENV`, default: `me-63384.dev.marginedge.com`) |
 
 ---
 

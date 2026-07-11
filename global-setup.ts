@@ -1,7 +1,7 @@
 import { chromium } from '@playwright/test';
 import path from 'path';
 import fs from 'fs';
-import config from './config/dev.json';
+import { config } from './config/config';
 
 export const USER_DATA_DIR = path.join(process.cwd(), config.browser.userDataDir);
 

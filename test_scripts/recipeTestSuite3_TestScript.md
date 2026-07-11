@@ -8,7 +8,7 @@
 | **Run Command**    | `npm run test:recipe3`                             |
 | **Execution Mode** | Serial                                             |
 | **Tenant**         | Wasabi Tysons (primary), Wasabi Natick & new tenant (cross-tenant verification) |
-| **Environment**    | DEV (`https://me-63384.dev.marginedge.com`)        |
+| **Environment**    | DEV (configurable via `TEST_ENV`, default: `me-63384.dev.marginedge.com`) |
 
 ---
 
@@ -26,10 +26,10 @@
 | Entity           | Naming Convention                         | Unit | Price |
 |------------------|-------------------------------------------|------|-------|
 | Recipe Type Menu | `Menu Type <TEST_RUN_ID>`                 | —    | —     |
-| Product 1        | `Automated Product <TEST_RUN_ID>`         | Case | $75   |
+| Product 1        | `S3 Product <TEST_RUN_ID>`                | Case | $75   |
 | Product 2        | `Automated Product2 <TEST_RUN_ID>`        | Case | $75   |
 | Product 3        | `Automated Product3 <TEST_RUN_ID>`        | Case | $75   |
-| Recipe 1         | `Automated Recipe <TEST_RUN_ID>`          | Case | —     |
+| Recipe 1         | `S3 Recipe <TEST_RUN_ID>`                 | Case | —     |
 | Recipe 2         | `Automated Recipe2 <TEST_RUN_ID>`         | Case | —     |
 | Recipe 3         | `Automated Recipe3 <TEST_RUN_ID>`         | Case | —     |
 | Count Sheet 1    | `Automated Countsheet <TEST_RUN_ID>`      | —    | —     |
@@ -64,12 +64,12 @@
 |------|--------|-----------------|
 | 2.1 | Navigate to Products via left nav | Products list loads |
 | 2.2 | Click **Add Product** | Add Product form opens |
-| 2.3 | Enter product name `Automated Product <RUN_ID>`, category **"Cleaning Supplies"**, unit **"Case"**, price **75** | Fields are filled |
+| 2.3 | Enter product name `S3 Product <RUN_ID>`, category **"Cleaning Supplies"**, unit **"Case"**, price **75** | Fields are filled |
 | 2.4 | Click **Save** and verify product appears in the list | Product created with price $75 |
 | 2.5 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
 | 2.6 | Click **Add Menu Item** | Add form opens |
-| 2.7 | Fill details: Name = `Automated Recipe <RUN_ID>`, Type = `Menu Type <RUN_ID>`, Quantity = **1**, Unit = **case** | Fields are filled |
-| 2.8 | Add ingredient: `Automated Product <RUN_ID>`, Quantity = **1**, Unit = **case** | Ingredient added |
+| 2.7 | Fill details: Name = `S3 Recipe <RUN_ID>`, Type = `Menu Type <RUN_ID>`, Quantity = **1**, Unit = **case** | Fields are filled |
+| 2.8 | Add ingredient: `S3 Product <RUN_ID>`, Quantity = **1**, Unit = **case** | Ingredient added |
 | 2.9 | Click **Save** | Recipe is saved |
 | 2.10 | Verify redirect to Menu Items list | Redirect confirmed |
 
@@ -84,7 +84,7 @@
 | 3.1 | Navigate to Inventory Setup page (`/#/inventorySetup`) | Inventory Setup page loads |
 | 3.2 | Click **Add Count Sheet** | Count sheet creation form opens |
 | 3.3 | Enter the count sheet name `Automated Countsheet <RUN_ID>` | Name is filled |
-| 3.4 | Click **Add Recipe**, search and select `Automated Recipe <RUN_ID>` | Recipe is selected |
+| 3.4 | Click **Add Recipe**, search and select `S3 Recipe <RUN_ID>` | Recipe is selected |
 | 3.5 | Click **Add Recipe** button in the modal | Recipe is added to the count sheet |
 | 3.6 | Scroll to the bottom and click **Save** | Count sheet is saved |
 | 3.7 | Verify the count sheet appears in the **Enter a Count** dropdown | Count sheet was created |
@@ -92,7 +92,7 @@
 | 3.9 | Click the **My Store** tab | My Store inventory view loads |
 | 3.10 | Select count sheet `Automated Countsheet <RUN_ID>` from the dropdown | Count entry form opens |
 | 3.11 | Set the inventory date to today | Date is set |
-| 3.12 | Enter **5** in the count input for `Automated Recipe <RUN_ID>` | Count is entered |
+| 3.12 | Enter **5** in the count input for `S3 Recipe <RUN_ID>` | Count is entered |
 | 3.13 | Click **Save Options** > **Save and Close** | Inventory is saved and closed |
 | 3.14 | Click **OK** in the confirmation dialog | Close is confirmed |
 | 3.15 | Navigate back and verify the count sheet appears as closed | Inventory is closed |
@@ -136,7 +136,7 @@
 | Step | Action | Expected Result |
 |------|--------|-----------------|
 | 6.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
-| 6.2 | Search for `Automated Recipe <RUN_ID>` and open it | Recipe detail page opens |
+| 6.2 | Search for `S3 Recipe <RUN_ID>` and open it | Recipe detail page opens |
 | 6.3 | Click the **activation toggle** | Toggle is clicked |
 | 6.4 | If a **"Recipe In Use"** modal appears, dismiss it | Deactivation may be blocked because of active inventory |
 
@@ -165,7 +165,7 @@
 | Step | Action | Expected Result |
 |------|--------|-----------------|
 | 8.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
-| 8.2 | Search for `Automated Recipe <RUN_ID>` and open it | Recipe detail page opens |
+| 8.2 | Search for `S3 Recipe <RUN_ID>` and open it | Recipe detail page opens |
 | 8.3 | Click the **activation toggle** | Recipe toggles off |
 | 8.4 | Verify the toggle returns **"deactivated"** (no "Recipe In Use" modal) | Recipe is no longer referenced by any inventory |
 | 8.5 | Verify the **"Recipe Is Disabled"** banner is visible | Recipe is confirmed disabled |

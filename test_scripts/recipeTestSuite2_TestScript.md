@@ -8,7 +8,7 @@
 | **Run Command**    | `npm run test:recipe2`                             |
 | **Execution Mode** | Serial                                             |
 | **Tenant**         | Wasabi Tysons (primary), Wasabi Natick (cross-tenant verification) |
-| **Environment**    | DEV (`https://me-63384.dev.marginedge.com`)        |
+| **Environment**    | DEV (configurable via `TEST_ENV`, default: `me-63384.dev.marginedge.com`) |
 
 ---
 
@@ -25,14 +25,18 @@
 | Entity             | Naming Convention                  | Unit     | Price |
 |--------------------|------------------------------------|----------|-------|
 | Recipe Type Menu   | `Menu Type <TEST_RUN_ID>`          | —        | —     |
-| Product            | `Automated Product <TEST_RUN_ID>`  | Case     | $75   |
-| Vendor Item        | `Automated VendorItem <TEST_RUN_ID>` | Case   | $75   |
-| Recipe             | `Automated Recipe <TEST_RUN_ID>`   | Case     | —     |
+| Product            | `S2 Product <TEST_RUN_ID>`         | Case     | $75   |
+| Vendor Item        | `Automated Item <TEST_RUN_ID>`     | Case     | $75   |
+| Recipe             | `S2 Recipe <TEST_RUN_ID>`          | Case     | —     |
 | UoM Product 1      | `UoM Product1 <TEST_RUN_ID>`      | Kilogram | $10   |
 | UoM Product 2      | `UoM Product2 <TEST_RUN_ID>`      | Kilogram | $20   |
 | UoM Product 3      | `UoM Product3 <TEST_RUN_ID>`      | Kilogram | $30   |
 | UoM Recipe         | `UoM Recipe <TEST_RUN_ID>`        | Kilogram | —     |
 | UoM Sub-Recipe     | `UoM SubRecipe <TEST_RUN_ID>`     | Kilogram | —     |
+| UoMEdit Product 1  | `UoMEdit Product1 <TEST_RUN_ID>`  | Kilogram | $10   |
+| UoMEdit Product 2  | `UoMEdit Product2 <TEST_RUN_ID>`  | Kilogram | $20   |
+| UoMEdit Recipe     | `UoMEdit Recipe <TEST_RUN_ID>`    | Kilogram | —     |
+| UoMEdit Sub-Recipe | `UoMEdit SubRecipe <TEST_RUN_ID>` | Kilogram | —     |
 
 > `TEST_RUN_ID` is a shared timestamp generated during global setup to ensure test isolation.
 
@@ -61,13 +65,13 @@
 |------|--------|-----------------|
 | 2.1 | Navigate to Products via left nav | Products list loads |
 | 2.2 | Click **Add Product** | Add Product form opens |
-| 2.3 | Enter product name `Automated Product <RUN_ID>`, category **"Cleaning Supplies"**, unit **"Case"**, price **75** | Fields are filled |
+| 2.3 | Enter product name `S2 Product <RUN_ID>`, category **"Cleaning Supplies"**, unit **"Case"**, price **75** | Fields are filled |
 | 2.4 | Click **Save** and verify product appears in the list | Product created with price $75 |
 | 2.5 | Navigate to Vendor Items via left nav | Vendor Items list loads |
 | 2.6 | Click **Add Vendor Item** | Add Vendor Item form opens |
 | 2.7 | Select vendor **"Arrow"** | Vendor is set |
-| 2.8 | Enter vendor item name `Automated VendorItem <RUN_ID>` | Name is filled |
-| 2.9 | Select product `Automated Product <RUN_ID>` | Product is linked |
+| 2.8 | Enter vendor item name `Automated Item <RUN_ID>` | Name is filled |
+| 2.9 | Select product `S2 Product <RUN_ID>` | Product is linked |
 | 2.10 | Click **Add Packaging Option**, fill details: **1 Case**, qty **1**, unit **Case**, price **75** | Packaging is set |
 | 2.11 | Click **Save** and verify vendor item appears in the list | Vendor item created |
 
@@ -81,11 +85,11 @@
 |------|--------|-----------------|
 | 3.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
 | 3.2 | Click **Add Menu Item** | Add form opens |
-| 3.3 | Fill details: Name = `Automated Recipe <RUN_ID>`, Type = `Menu Type <RUN_ID>`, Quantity = **1**, Unit = **case** | Fields are filled |
-| 3.4 | Add ingredient: `Automated Product <RUN_ID>`, Quantity = **1**, Unit = **case** | Ingredient added |
+| 3.3 | Fill details: Name = `S2 Recipe <RUN_ID>`, Type = `Menu Type <RUN_ID>`, Quantity = **1**, Unit = **case** | Fields are filled |
+| 3.4 | Add ingredient: `S2 Product <RUN_ID>`, Quantity = **1**, Unit = **case** | Ingredient added |
 | 3.5 | Click **Save** | Recipe is saved |
 | 3.6 | Verify redirect to Menu Items list | Redirect confirmed |
-| 3.7 | Search for `Automated Recipe <RUN_ID>` in Menu Items | Recipe row appears |
+| 3.7 | Search for `S2 Recipe <RUN_ID>` in Menu Items | Recipe row appears |
 | 3.8 | Verify the cost column shows **$75.00** | Initial cost is correct |
 
 ---
@@ -114,7 +118,7 @@
 | 4.15 | Wait for lock and process invoice | Invoice is locked |
 | 4.16 | Select vendor **"Arrow"**, fill existing invoice number | Fields set |
 | 4.17 | Fill invoice date, dismiss remittance address if present | Date set |
-| 4.18 | Add existing vendor line item `Automated VendorItem <RUN_ID>` | Line item added |
+| 4.18 | Add existing vendor line item `Automated Item <RUN_ID>` | Line item added |
 | 4.19 | Set handwriting to **No** | Handwriting flag set |
 | 4.20 | Mark reconciliation complete, save and complete | Reconciliation done |
 | 4.21 | Click **Verified** in the modal | Verified |
@@ -131,9 +135,9 @@
 | 5.2 | Check invoice status — if **"In Processing"**, proceed; if **"Closed"**, skip final review | Status determined |
 | 5.3 | If In Processing: open order, mark reviewed for close, save and complete final review | Final review done |
 | 5.4 | Click **Verified** in the modal | Verified |
-| 5.5 | Navigate to Products, search for `Automated Product <RUN_ID>` | Product row appears |
+| 5.5 | Navigate to Products, search for `S2 Product <RUN_ID>` | Product row appears |
 | 5.6 | Open product, click **Edit Product**, scroll to bottom and **Save** | Product re-saved to trigger price update |
-| 5.7 | Navigate to Menu Items, search for `Automated Recipe <RUN_ID>` | Recipe row appears |
+| 5.7 | Navigate to Menu Items, search for `S2 Recipe <RUN_ID>` | Recipe row appears |
 | 5.8 | Verify the cost column contains **80** (retry up to 5 times with 15s waits) | Cost updated from $75 to $80 |
 
 ---
@@ -145,7 +149,7 @@
 | Step | Action | Expected Result |
 |------|--------|-----------------|
 | 6.1 | Switch tenant to **Wasabi Natick** | Tenant switches |
-| 6.2 | Navigate to Menu Items, search for `Automated Recipe <RUN_ID>` | Recipe row appears |
+| 6.2 | Navigate to Menu Items, search for `S2 Recipe <RUN_ID>` | Recipe row appears |
 | 6.3 | Verify the cost column shows **$75.00** (old price — invoice price is tenant-specific) | Old price in Natick |
 | 6.4 | Switch tenant back to **Wasabi Tysons** | Tenant switches back |
 
@@ -286,6 +290,86 @@
 
 ---
 
+### Stage 16: Add UoMEdit Products (Kilogram)
+
+> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
+
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 16.1 | Navigate to Products via left nav | Products list loads |
+| 16.2 | Click **Add Product** | Add Product form opens |
+| 16.3 | Enter product name `UoMEdit Product1 <RUN_ID>`, category **"Cleaning Supplies"**, unit **"Kilogram"**, price **10** | Fields are filled |
+| 16.4 | Click **Save** and verify product appears in the list | Product 1 created with price $10/kg |
+| 16.5 | Repeat steps 16.1–16.4 for `UoMEdit Product2 <RUN_ID>` with price **20** | Product 2 created with price $20/kg |
+
+---
+
+### Stage 17: Create UoMEdit Recipe and Sub-Recipe
+
+> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
+
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 17.1 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
+| 17.2 | Click **Add Menu Item** | Add form opens |
+| 17.3 | Fill details: Name = `UoMEdit Recipe <RUN_ID>`, Type = `Menu Type <RUN_ID>`, Quantity = **1**, Unit = **kilogram** | Fields are filled |
+| 17.4 | Add ingredient: `UoMEdit Product1 <RUN_ID>`, Quantity = **1**, Unit = **kilogram** | Ingredient 1 added |
+| 17.5 | Click **Add ingredient**, add `UoMEdit Product2 <RUN_ID>`, Quantity = **1**, Unit = **kilogram** | Ingredient 2 added |
+| 17.6 | Click **Save** | Recipe is saved |
+| 17.7 | Verify redirect to Menu Items list | Redirect confirmed |
+| 17.8 | Navigate to **Recipes** > **Menu Items** | Menu Items list loads |
+| 17.9 | Click **Add Menu Item** | Add form opens |
+| 17.10 | Fill details: Name = `UoMEdit SubRecipe <RUN_ID>`, Type = `Menu Type <RUN_ID>`, Quantity = **1**, Unit = **kilogram** | Fields are filled |
+| 17.11 | Add ingredient: `UoMEdit Recipe <RUN_ID>`, Quantity = **1**, Unit = **kilogram** | Recipe is added as ingredient |
+| 17.12 | Click **Save** | Sub-recipe is saved |
+| 17.13 | Verify redirect to Menu Items list | Redirect confirmed |
+
+---
+
+### Stage 18: Edit UoMEdit Recipe — Change Ingredient Units to Pound
+
+> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
+> **Purpose:** Edit the recipe (not the product) to change ingredient units from Kilogram to Pound, and verify the price recalculation.
+
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 18.1 | Navigate to Menu Items, search for `UoMEdit Recipe <RUN_ID>` | Recipe row appears |
+| 18.2 | Click on the recipe to open detail page | Detail page opens |
+| 18.3 | Click **Edit Recipe** | Edit form opens (URL contains `/recipe/<id>/edit`) |
+| 18.4 | Change ingredient 1 unit from **Kilogram** to **Pound** | Unit is changed (handle conversion modal if it appears) |
+| 18.5 | Change ingredient 2 unit from **Kilogram** to **Pound** | Unit is changed (handle conversion modal if it appears) |
+| 18.6 | Scroll to bottom and click **Save** | Recipe is saved with updated ingredient units |
+
+---
+
+### Stage 19: Verify UoMEdit Prices After Ingredient Unit Change (Tysons)
+
+> **Logged in as:** `accountmanager` | **Tenant:** Wasabi Tysons
+
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 19.1 | Navigate to Menu Items, search for `UoMEdit Recipe <RUN_ID>` | Recipe row appears |
+| 19.2 | Verify the cost column shows **$13.61** (changed from $30.00 due to kg→lb conversion on both ingredients) | Cost updated |
+| 19.3 | Navigate to Menu Items, search for `UoMEdit SubRecipe <RUN_ID>` | Sub-recipe row appears |
+| 19.4 | Verify the cost column shows **$13.61** | Sub-recipe cost also updated |
+
+---
+
+### Stage 20: Cross-Tenant Verification (Natick — After UoMEdit Ingredient Unit Change)
+
+> **Logged in as:** `accountmanager`
+
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 20.1 | Switch tenant to **Wasabi Natick** | Tenant switches |
+| 20.2 | Navigate to Menu Items, search for `UoMEdit Recipe <RUN_ID>` | Recipe row appears |
+| 20.3 | Verify the cost column shows **$13.61** | Updated price reflected in Natick |
+| 20.4 | Navigate to Menu Items, search for `UoMEdit SubRecipe <RUN_ID>` | Sub-recipe row appears |
+| 20.5 | Verify the cost column shows **$13.61** | Updated sub-recipe price reflected in Natick |
+| 20.6 | Switch tenant back to **Wasabi Tysons** | Tenant switches back |
+
+---
+
 ## Results Tracker
 
 The automated test tracks the following stages. Each defaults to **failed** and is set to **passed** upon successful completion:
@@ -328,6 +412,17 @@ The automated test tracks the following stages. Each defaults to **failed** and 
 | 34 | Verify UoM Recipe Price In Natick After Unit Change | pending |
 | 35 | Verify UoM SubRecipe Price In Natick After Unit Change | pending |
 | 36 | Switch Back To Tysons After Unit Change | pending |
+| 37 | Add UoMEdit Product 1 | pending |
+| 38 | Add UoMEdit Product 2 | pending |
+| 39 | Add UoMEdit Recipe | pending |
+| 40 | Add UoMEdit SubRecipe | pending |
+| 41 | Edit UoMEdit Recipe Ingredient Units | pending |
+| 42 | Verify UoMEdit Recipe Price After Change | pending |
+| 43 | Verify UoMEdit SubRecipe Price After Change | pending |
+| 44 | Switch To Natick After UoMEdit Change | pending |
+| 45 | Verify UoMEdit Recipe Price In Natick After Change | pending |
+| 46 | Verify UoMEdit SubRecipe Price In Natick After Change | pending |
+| 47 | Switch Back To Tysons After UoMEdit Change | pending |
 
 ---
 
@@ -390,10 +485,32 @@ accountmanager ──> Recipe Types, Products, Vendor Items, Menu Items,
        │       ──> UoM Recipe price = $72.05
        │       ──> UoM SubRecipe price = $72.05
        │
-       └──> Cross-Tenant Verification After Unit Change (Stage 15)
+       ├──> Cross-Tenant Verification After Unit Change (Stage 15)
+       │       Switch to Wasabi Natick
+       │       ──> UoM Recipe price = $72.05
+       │       ──> UoM SubRecipe price = $72.05
+       │       Switch back to Wasabi Tysons
+       │
+       ├──> UoMEdit Products Setup (Stage 16)
+       │       Add UoMEdit Product 1 ($10/kg)
+       │       Add UoMEdit Product 2 ($20/kg)
+       │
+       ├──> UoMEdit Recipe & Sub-Recipe (Stage 17)
+       │       Create Recipe with 2 kg ingredients (cost $30)
+       │       Create Sub-Recipe using UoMEdit Recipe as ingredient (cost $30)
+       │
+       ├──> Edit Recipe Ingredient Units (Stage 18)
+       │       Edit UoMEdit Recipe: change both ingredient units
+       │       from Kilogram → Pound (via recipe edit form)
+       │
+       ├──> Verify Updated Prices in Tysons (Stage 19)
+       │       ──> UoMEdit Recipe price = $13.61
+       │       ──> UoMEdit SubRecipe price = $13.61
+       │
+       └──> Cross-Tenant Verification After UoMEdit Change (Stage 20)
                Switch to Wasabi Natick
-               ──> UoM Recipe price = $72.05
-               ──> UoM SubRecipe price = $72.05
+               ──> UoMEdit Recipe price = $13.61
+               ──> UoMEdit SubRecipe price = $13.61
                Switch back to Wasabi Tysons
 ```
 
@@ -403,12 +520,14 @@ accountmanager ──> Recipe Types, Products, Vendor Items, Menu Items,
 
 - All tests run in **serial mode** because each stage depends on prior stages.
 - The entire suite runs under a single `accountmanager` session.
-- The suite covers two main areas:
+- The suite covers three main areas:
   1. **Invoice Processing Price Update** — creating a product/vendor item/recipe, processing an invoice to change the product price from $75 to $80, and verifying the recipe cost updates. Cross-tenant check confirms Natick still shows the old $75 price.
   2. **UoM Unit Change Price Update** — creating products with kilogram units, building recipes, changing a product's unit from kilogram to pound via the "Edit Unit and Name" modal, and verifying the recipe cost changes from $60.00 to $72.05 across both tenants.
+  3. **UoMEdit Ingredient Unit Change** — creating 2 products ($10/kg and $20/kg), building a recipe and sub-recipe, then editing the recipe to change both ingredient units from kilogram to pound (via the recipe edit form, not the product), and verifying the recipe cost changes from $30.00 to $13.61 across both tenants.
 - The invoice status check after reconciliation handles two possible states: if the invoice auto-closes, the final review step is skipped.
 - The recipe cost verification after order close uses a retry loop (up to 5 attempts with 15s waits) to account for async price propagation.
 - Products in use by recipes cannot have their unit edited normally; the **"Edit Unit and Name"** modal must be used instead. This modal contains a `<select name="reportUnit">` dropdown.
 - The **Ingredient Total** field on the recipe detail page is accessed via `getByRole('textbox', { name: 'Ingredient Total' })`.
-- The `createResultsTracker` utility logs a summary table of all 36 stage outcomes in the `afterAll` hook.
+- The `editIngredientUnit(index, unit)` method on `MenuItemsPage` handles changing an ingredient's unit in the recipe edit form, including dismissing the conversion modal if it appears.
+- The `createResultsTracker` utility logs a summary table of all 47 stage outcomes in the `afterAll` hook.
 - The test generates a unique `TEST_RUN_ID` timestamp to prevent name collisions.

@@ -1,7 +1,7 @@
 import { Page, Locator } from '@playwright/test';
-import devConfig from '../config/dev.json';
+import { config } from '../config/config';
 
-export const config = devConfig;
+export { config };
 export const TIMEOUT = config.timeouts;
 
 export class BasePage {

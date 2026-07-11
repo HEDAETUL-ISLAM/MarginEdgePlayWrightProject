@@ -87,10 +87,12 @@ class JiraReporter implements Reporter {
     const statusIcon = failed > 0 ? '(x)' : '(/)';
     const overallStatus = result.status === 'passed' ? 'PASSED' : 'FAILED';
     const testPlanName = Array.from(this.suiteNames).join(', ') || 'Unnamed Test Plan';
+    const environment = process.env.TEST_ENV || 'me-63384';
 
     let comment = `h2. ${statusIcon} Playwright Test Results — ${overallStatus}\n`;
     comment += `h3. Test Plan: ${testPlanName}\n\n`;
     comment += `||Metric||Value||\n`;
+    comment += `|Environment|${environment}.dev.marginedge.com|\n`;
     comment += `|Test Plan|${testPlanName}|\n`;
     comment += `|Total Tests|${total}|\n`;
     comment += `|Passed (/) |${passed}|\n`;
@@ -99,15 +101,23 @@ class JiraReporter implements Reporter {
     comment += `|Overall|${overallStatus}|\n`;
     comment += `|Date|${new Date().toISOString()}|\n`;
 
+    comment += `\nh2. All Test Cases\n\n`;
+    comment += `||#||Test||Status||Duration||\n`;
+    for (let i = 0; i < this.results.length; i++) {
+      const t = this.results[i];
+      const durationSec = (t.duration / 1000).toFixed(1);
+      const icon = t.status === 'passed' ? '(/)' : t.status === 'skipped' ? '(!)' : '(x)';
+      comment += `|${i + 1}|${t.title}|${icon} ${t.status}|${durationSec}s|\n`;
+    }
+
     if (failedTests.length > 0) {
-      comment += `\nh2. (x) Failed Tests\n\n`;
-      comment += `||Test||Duration||Error||\n`;
+      comment += `\nh2. (x) Failed Test Details\n\n`;
+      comment += `||Test||Error||\n`;
       for (const t of failedTests) {
-        const durationSec = (t.duration / 1000).toFixed(1);
         const errorText = t.error
           ? t.error.substring(0, 300).replace(/[|]/g, '\\|').replace(/\n/g, ' ')
           : 'No error message';
-        comment += `|${t.title}|${durationSec}s|${errorText}|\n`;
+        comment += `|${t.title}|${errorText}|\n`;
       }
     }
 

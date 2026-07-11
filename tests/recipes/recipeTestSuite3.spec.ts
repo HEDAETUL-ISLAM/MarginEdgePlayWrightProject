@@ -90,12 +90,12 @@ test.describe('Recipe Test Suite 3', () => {
     await productPage.navigateViaLeftNav();
     await productPage.verifyProductsPageLoaded();
     await productPage.clickAddProduct();
-    await productPage.enterProductName(testNames.product);
+    await productPage.enterProductName(testNames.s3Product);
     await productPage.selectCategory('Cleaning Supplies');
     await productPage.selectUnit('Case');
     await productPage.setProductPrice('75');
     await productPage.clickSave();
-    await productPage.verifyProductCreated(testNames.product);
+    await productPage.verifyProductCreated(testNames.s3Product);
     results['Add Product'] = 'passed';
   });
 
@@ -103,8 +103,8 @@ test.describe('Recipe Test Suite 3', () => {
     await menuItemsPage.navigateToMenuItems();
     await menuItemsPage.verifyMenuItemsPageLoaded();
     await menuItemsPage.openAddMenuItemForm();
-    await menuItemsPage.fillMenuItemDetails(testNames.recipe, testNames.recipeTypeMenu, '1', 'case');
-    await menuItemsPage.addIngredient(testNames.product, '1', 'case');
+    await menuItemsPage.fillMenuItemDetails(testNames.s3Recipe, testNames.recipeTypeMenu, '1', 'case');
+    await menuItemsPage.addIngredient(testNames.s3Product, '1', 'case');
     await menuItemsPage.clickSave();
     await menuItemsPage.verifyRedirectedToMenuItemsList();
     results['Add Menu Item'] = 'passed';
@@ -119,7 +119,7 @@ test.describe('Recipe Test Suite 3', () => {
     await countSheetPage.clickAddCountSheet();
     await countSheetPage.fillCountSheetName(testNames.countSheet);
     await countSheetPage.clickAddRecipe();
-    await countSheetPage.searchAndSelectRecipe(testNames.recipe);
+    await countSheetPage.searchAndSelectRecipe(testNames.s3Recipe);
     await countSheetPage.clickAddRecipeInModal();
     await countSheetPage.scrollToBottomAndSave();
     await countSheetPage.verifyCountSheetCreated(testNames.countSheet);
@@ -131,7 +131,7 @@ test.describe('Recipe Test Suite 3', () => {
     await inventoryPage.selectMyStoreTab();
     await inventoryPage.selectCountSheet(testNames.countSheet);
     await inventoryPage.setInventoryDate();
-    await inventoryPage.enterCountForRecipe(testNames.recipe, '5');
+    await inventoryPage.enterCountForRecipe(testNames.s3Recipe, '5');
     await inventoryPage.saveAndCloseInventory();
     await inventoryPage.confirmClose();
     await inventoryPage.navigateToInventoryCounts();
@@ -146,9 +146,9 @@ test.describe('Recipe Test Suite 3', () => {
   test('Update inventory count sheet', async () => {
     await countSheetPage.navigateToInventorySetup();
     await countSheetPage.openCountSheet(testNames.countSheet);
-    await countSheetPage.deleteRecipeFromCountSheet(testNames.recipe);
+    await countSheetPage.deleteRecipeFromCountSheet(testNames.s3Recipe);
     await countSheetPage.scrollToBottomAndSave();
-    await countSheetPage.verifyRecipeRemoved(testNames.recipe);
+    await countSheetPage.verifyRecipeRemoved(testNames.s3Recipe);
     results['Update Inventory'] = 'passed';
   });
 
@@ -168,8 +168,8 @@ test.describe('Recipe Test Suite 3', () => {
   test('Deactivate recipe', async () => {
     await menuItemsPage.navigateToMenuItems();
     await menuItemsPage.verifyMenuItemsPageLoaded();
-    await menuItemsPage.searchMenuItem(testNames.recipe);
-    await menuItemsPage.openMenuItemByName(testNames.recipe);
+    await menuItemsPage.searchMenuItem(testNames.s3Recipe);
+    await menuItemsPage.openMenuItemByName(testNames.s3Recipe);
     await menuItemsPage.toggleRecipeOff();
     results['Deactivate Recipe'] = 'passed';
   });
@@ -187,8 +187,8 @@ test.describe('Recipe Test Suite 3', () => {
   test('Deactivate recipe after inventory delete', async () => {
     await menuItemsPage.navigateToMenuItems();
     await menuItemsPage.verifyMenuItemsPageLoaded();
-    await menuItemsPage.searchMenuItem(testNames.recipe);
-    await menuItemsPage.openMenuItemByName(testNames.recipe);
+    await menuItemsPage.searchMenuItem(testNames.s3Recipe);
+    await menuItemsPage.openMenuItemByName(testNames.s3Recipe);
     const result = await menuItemsPage.toggleRecipeOff();
     expect(result).toBe('deactivated');
     await menuItemsPage.verifyRecipeDisabled();

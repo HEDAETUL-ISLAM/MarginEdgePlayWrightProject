@@ -257,6 +257,10 @@ export class MenuItemsPage extends BasePage {
     await fileChooser.setFiles(absolutePath);
     await this.page.waitForTimeout(2000);
 
+    // Close the file upload dialog if it's still open
+    await this.page.keyboard.press('Escape');
+    await this.page.waitForTimeout(500);
+
     // Verify the unsupported format modal appears
     const modal = this.page.getByRole('dialog').filter({ hasText: /unsupported image format detected/i });
     await modal.waitFor({ state: 'visible', timeout: TIMEOUT.default });
@@ -286,6 +290,30 @@ export class MenuItemsPage extends BasePage {
     await addButton.waitFor({ state: 'visible', timeout: TIMEOUT.default });
     await addButton.click();
     await this.page.waitForTimeout(500);
+  }
+
+  async editIngredientUnit(ingredientIndex: number, newUnit: string) {
+    const ingredientRows = this.page.getByRole('row').filter({ has: this.page.getByPlaceholder('Unit') });
+    const row = ingredientRows.nth(ingredientIndex);
+
+    const unitInput = row.getByPlaceholder('Unit');
+    await unitInput.click();
+    await unitInput.fill(newUnit);
+    await this.page.getByRole('option', { name: new RegExp(newUnit, 'i') }).first().click();
+    await this.page.waitForTimeout(500);
+
+    // Handle conversion modal if it appears
+    const howManyInput = this.page.getByPlaceholder('how many');
+    if (await this.isVisible(howManyInput)) {
+      await howManyInput.fill('1');
+      const unitsCombobox = this.page.getByRole('combobox');
+      await unitsCombobox.click();
+      await this.page.waitForTimeout(500);
+      await this.page.getByRole('option').first().click();
+      await this.page.waitForTimeout(500);
+      await this.page.getByRole('button', { name: 'Save' }).click();
+      await this.page.waitForTimeout(500);
+    }
   }
 
   async setGlobalMenuPrice(price: string) {
