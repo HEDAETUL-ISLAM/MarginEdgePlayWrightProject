@@ -120,7 +120,7 @@ test.describe('Recipe Test Suite', () => {
     await menuItemsPage.navigateToMenuItems();
     await menuItemsPage.verifyMenuItemsPageLoaded();
     await menuItemsPage.openAddMenuItemForm();
-    await menuItemsPage.fillMenuItemDetails(testNames.recipe, testNames.recipeTypeMenu, '1', 'case');
+    await menuItemsPage.fillMenuItemDetails(testNames.recipe, 'test', '1', 'case');
     await menuItemsPage.scrollToMethodSection();
     await menuItemsPage.uploadUnsupportedMethodAttachment(0, 'unsupported.avif');
     results['Unsupported Image Format Modal'] = 'passed';

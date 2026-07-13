@@ -242,24 +242,11 @@ export class MenuItemsPage extends BasePage {
   }
 
   async uploadUnsupportedMethodAttachment(stepIndex: number, filePath: string) {
-    const uploadButton = this.page.locator('[data-testid="fileUploadButton"]').nth(stepIndex);
-    await uploadButton.waitFor({ state: 'visible', timeout: TIMEOUT.default });
-
-    await uploadButton.click();
-    await this.page.waitForTimeout(500);
-
-    const fileChooserPromise = this.page.waitForEvent('filechooser');
-    await uploadButton.click();
-
-    const fileChooser = await fileChooserPromise;
     const fixturesDir = path.resolve('fixtures', 'files', 'recipeMethod');
     const absolutePath = path.resolve(fixturesDir, filePath);
-    await fileChooser.setFiles(absolutePath);
+    const fileInput = this.page.locator('input[type="file"]').nth(stepIndex);
+    await fileInput.setInputFiles(absolutePath);
     await this.page.waitForTimeout(2000);
-
-    // Close the file upload dialog if it's still open
-    await this.page.keyboard.press('Escape');
-    await this.page.waitForTimeout(500);
 
     // Verify the unsupported format modal appears
     const modal = this.page.getByRole('dialog').filter({ hasText: /unsupported image format detected/i });
