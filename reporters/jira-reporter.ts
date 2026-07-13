@@ -77,6 +77,10 @@ class JiraReporter implements Reporter {
     const statusIcon = failed > 0 ? '(x)' : '(/)';
     const overallStatus = result.status === 'passed' ? 'PASSED' : 'FAILED';
     const environment = process.env.TEST_ENV || 'me-63384';
+    const totalDurationMs = this.results.reduce((sum, r) => sum + r.duration, 0);
+    const totalMinutes = Math.floor(totalDurationMs / 60000);
+    const totalSeconds = Math.floor((totalDurationMs % 60000) / 1000);
+    const totalDuration = `${totalMinutes}m ${totalSeconds}s`;
 
     let comment = `h2. ${statusIcon} Playwright Test Results — ${overallStatus}\n\n`;
     comment += `||Metric||Value||\n`;
@@ -85,17 +89,9 @@ class JiraReporter implements Reporter {
     comment += `|Passed (/) |${passed}|\n`;
     comment += `|Failed (x) |${failed}|\n`;
     comment += `|Skipped|${skipped}|\n`;
+    comment += `|Total Duration|${totalDuration}|\n`;
     comment += `|Overall|${overallStatus}|\n`;
     comment += `|Date|${new Date().toISOString()}|\n`;
-
-    comment += `\nh2. All Test Cases\n\n`;
-    comment += `||#||Test||Status||Duration||\n`;
-    for (let i = 0; i < this.results.length; i++) {
-      const t = this.results[i];
-      const durationSec = (t.duration / 1000).toFixed(1);
-      const icon = t.status === 'passed' ? '(/)' : t.status === 'skipped' ? '(!)' : '(x)';
-      comment += `|${i + 1}|${t.title}|${icon} ${t.status}|${durationSec}s|\n`;
-    }
 
     if (failedTests.length > 0) {
       comment += `\nh2. (x) Failed Test Details\n\n`;
