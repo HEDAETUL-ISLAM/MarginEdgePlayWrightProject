@@ -21,7 +21,6 @@ class JiraReporter implements Reporter {
   private jiraEmail = '';
   private jiraApiToken = '';
   private results: TestRecord[] = [];
-  private suiteNames = new Set<string>();
 
   onBegin(config: FullConfig, suite: Suite): void {
     const ticket = process.env.JIRA_TICKET;
@@ -44,15 +43,6 @@ class JiraReporter implements Reporter {
 
   onTestEnd(test: TestCase, result: TestResult): void {
     if (!this.enabled) return;
-
-    // Collect describe block names as test plan names
-    let parent = test.parent;
-    while (parent) {
-      if (parent.title) {
-        this.suiteNames.add(parent.title);
-      }
-      parent = parent.parent;
-    }
 
     const record: TestRecord = {
       title: test.title,
@@ -86,14 +76,11 @@ class JiraReporter implements Reporter {
 
     const statusIcon = failed > 0 ? '(x)' : '(/)';
     const overallStatus = result.status === 'passed' ? 'PASSED' : 'FAILED';
-    const testPlanName = Array.from(this.suiteNames).join(', ') || 'Unnamed Test Plan';
     const environment = process.env.TEST_ENV || 'me-63384';
 
-    let comment = `h2. ${statusIcon} Playwright Test Results — ${overallStatus}\n`;
-    comment += `h3. Test Plan: ${testPlanName}\n\n`;
+    let comment = `h2. ${statusIcon} Playwright Test Results — ${overallStatus}\n\n`;
     comment += `||Metric||Value||\n`;
     comment += `|Environment|${environment}.dev.marginedge.com|\n`;
-    comment += `|Test Plan|${testPlanName}|\n`;
     comment += `|Total Tests|${total}|\n`;
     comment += `|Passed (/) |${passed}|\n`;
     comment += `|Failed (x) |${failed}|\n`;
