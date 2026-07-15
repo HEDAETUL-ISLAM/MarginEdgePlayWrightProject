@@ -44,6 +44,17 @@ npx playwright test tests/recipes/recipeTestSuite1.spec.ts --workers=1 --timeout
 TEST_ENV=me-66668 npx playwright test tests/recipes/recipeTestSuite1.spec.ts tests/recipes/recipeTestSuite2.spec.ts tests/recipes/recipeTestSuite3.spec.ts --workers=1 --timeout 600000
 ```
 
+## Full Example (Environment + Jira + Legacy Reconciliation)
+
+```bash
+TEST_ENV=me-66717 \
+JIRA_TICKET=ME-66717 \
+JIRA_BASE_URL=https://marginedge.atlassian.net \
+JIRA_EMAIL=user@co.com \
+JIRA_API_TOKEN=xxx \
+npx playwright test tests/invoiceProcessing/legacyReconciliationProcess.spec.ts --project=legacyReconciliation --workers=1 --timeout 600000
+```
+
 ## Full Example (Environment + Jira + All Suites)
 
 ```bash

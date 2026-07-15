@@ -28,7 +28,7 @@ test.describe('Legacy Reconciliation Process', () => {
     'Assign Lead Analyst to Second Analyst',
     'Set Office for Analyst 1',
     'Set Office for Analyst 2',
-    'Set Office for Analyst 3',
+    'Set Office for Lead Analyst',
     'Add Product',
     'Add Vendor Item',
     'File Uploaded',

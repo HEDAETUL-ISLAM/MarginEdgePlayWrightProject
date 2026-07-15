@@ -21,6 +21,7 @@ class JiraReporter implements Reporter {
   private jiraEmail = '';
   private jiraApiToken = '';
   private results: TestRecord[] = [];
+  private testPlanNames: Set<string> = new Set();
 
   onBegin(config: FullConfig, suite: Suite): void {
     const ticket = process.env.JIRA_TICKET;
@@ -60,6 +61,12 @@ class JiraReporter implements Reporter {
     }
 
     this.results.push(record);
+
+    // Capture the test plan (describe block) name
+    const describeName = test.parent.title;
+    if (describeName) {
+      this.testPlanNames.add(describeName);
+    }
   }
 
   async onEnd(result: FullResult): Promise<void> {
@@ -82,7 +89,12 @@ class JiraReporter implements Reporter {
     const totalSeconds = Math.floor((totalDurationMs % 60000) / 1000);
     const totalDuration = `${totalMinutes}m ${totalSeconds}s`;
 
+    const testPlanLabel = this.testPlanNames.size > 0
+      ? Array.from(this.testPlanNames).join(', ')
+      : 'Unknown';
+
     let comment = `h2. ${statusIcon} Playwright Test Results — ${overallStatus}\n\n`;
+    comment += `*Test Plan:* ${testPlanLabel}\n\n`;
     comment += `||Metric||Value||\n`;
     comment += `|Environment|${environment}.dev.marginedge.com|\n`;
     comment += `|Total Tests|${total}|\n`;
