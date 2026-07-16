@@ -9,7 +9,7 @@ import { testNames } from '../../fixtures/testData';
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('Recipe Test Suite 3', () => {
+test.describe('Recipe Active Deactive', () => {
   let productPage: ProductPage;
   let menuItemsPage: MenuItemsPage;
   let countSheetPage: CountSheet;
@@ -17,7 +17,7 @@ test.describe('Recipe Test Suite 3', () => {
   let restaurantUnitPage: RestaurantUnitPage;
   let recipeSetupPage: RecipeSetupPage;
 
-  const { results, logResults } = createResultsTracker('Recipe Test Suite 3', [
+  const { results, logResults } = createResultsTracker('Recipe Active Deactive', [
     // Tenant & Recipe Type
     'Switch To Wasabi Tysons',
     'Add Menu Recipe Type',

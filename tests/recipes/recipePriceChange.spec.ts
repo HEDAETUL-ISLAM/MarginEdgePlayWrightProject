@@ -8,7 +8,7 @@ import { testNames } from '../../fixtures/testData';
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('Recipe Test Suite 2', () => {
+test.describe('Recipe Price Change', () => {
   let productPage: ProductPage;
   let vendorItemPage: VendorItemPage;
   let orderPage: OrderPage;
@@ -16,7 +16,7 @@ test.describe('Recipe Test Suite 2', () => {
   let recipeSetupPage: RecipeSetupPage;
   let invoiceNumber: string;
 
-  const { results, logResults } = createResultsTracker('Recipe Test Suite 2', [
+  const { results, logResults } = createResultsTracker('Recipe Price Change', [
     // Tenant & Recipe Type
     'Switch To Wasabi Tysons',
     'Add Menu Recipe Type',

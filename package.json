@@ -8,9 +8,10 @@
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
     "test:report": "playwright show-report",
-    "test:recipe1": "npx playwright test tests/recipes/recipeTestSuite1.spec.ts --headed --project=chromium",
-    "test:recipe2": "npx playwright test tests/recipes/recipeTestSuite2.spec.ts --headed --project=chromium",
-    "test:recipe3": "npx playwright test tests/recipes/recipeTestSuite3.spec.ts --headed --project=chromium",
+    "test:recipe1": "npx playwright test tests/recipes/recipeRegressionTest.spec.ts --headed --project=chromium",
+    "test:plateCost": "npx playwright test tests/recipes/recipePlateCost.spec.ts --headed --project=chromium",
+    "test:recipe2": "npx playwright test tests/recipes/recipePriceChange.spec.ts --headed --project=chromium",
+    "test:recipe3": "npx playwright test tests/recipes/recipeActiveDeactive.spec.ts --headed --project=chromium",
     "test:legacy-recon": "npx playwright test tests/invoiceProcessing/legacyReconciliationProcess.spec.ts --headed --project=legacyReconciliation",
     "test:edi-invoices": "npx playwright test tests/invoiceProcessing/ediInvoices.spec.ts --headed --project=chromium",
     "mcp": "npx @playwright/mcp@latest"
