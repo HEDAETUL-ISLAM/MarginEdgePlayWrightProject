@@ -30,16 +30,5 @@ export default defineConfig({
         },
       },
     },
-    {
-      name: 'legacyReconciliation',
-      testMatch: 'invoiceProcessing/legacyReconciliationProcess.spec.ts',
-      use: {
-        ...devices['Desktop Chrome'],
-        channel: 'chrome',
-        launchOptions: {
-          args: ['--ignore-certificate-errors', '--user-data-dir=./browser-data/playwright-chrome'],
-        },
-      },
-    },
   ],
 });

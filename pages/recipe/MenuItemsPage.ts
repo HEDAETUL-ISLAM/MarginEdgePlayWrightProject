@@ -405,6 +405,30 @@ export class MenuItemsPage extends BasePage {
     await this.page.waitForTimeout(2000);
   }
 
+  async clickEditAlert() {
+    const editOption = this.page.getByRole('menuitem', { name: /edit alert/i });
+    await editOption.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await editOption.click();
+    await this.page.waitForTimeout(1000);
+  }
+
+  async editCostAlertThreshold(under: string, over: string) {
+    const underInput = this.page.getByRole('spinbutton').first();
+    await underInput.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await underInput.fill(under);
+
+    const overInput = this.page.getByRole('spinbutton').last();
+    await overInput.fill(over);
+  }
+
+  async clickSaveChanges() {
+    const saveButton = this.page.getByRole('button', { name: /save changes/i });
+    await saveButton.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await saveButton.click();
+    await this.page.waitForLoadState('networkidle', { timeout: TIMEOUT.long });
+    await this.page.waitForTimeout(2000);
+  }
+
   async addMultipleMethods(methods: { text: string; filePath: string }[]) {
     const fixturesDir = path.resolve('fixtures', 'files', 'recipeMethod');
 

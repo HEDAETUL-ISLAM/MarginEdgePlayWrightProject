@@ -55,6 +55,9 @@ test.describe('Recipe Plate Cost', () => {
     'Add Plate Cost Alert Recipe',
     'Create Cost Alert for Plate Cost Alert Recipe',
     'Verify Cost Alert Status is On',
+    // Edit Plate Cost Alert
+    'Edit Plate Cost Alert Threshold',
+    'Verify Cost Alert Status After Edit',
   ]);
 
   test.beforeAll(async ({ persistentPage }) => {
@@ -354,7 +357,7 @@ test.describe('Recipe Plate Cost', () => {
     await menuItemsPage.navigateToMenuItems();
     await menuItemsPage.verifyMenuItemsPageLoaded();
     await menuItemsPage.openAddMenuItemForm();
-    await menuItemsPage.fillMenuItemDetails(testNames.plateCostAlertRecipe, testNames.recipeTypeMenu, '1', 'each');
+    await menuItemsPage.fillMenuItemDetails(testNames.plateCostAlertRecipe, 'test', '1', 'each');
     await menuItemsPage.addIngredient(testNames.plateCostAlertProduct, '1', 'each');
     await menuItemsPage.setGlobalMenuPrice('100');
     await menuItemsPage.clickSave();
@@ -375,5 +378,27 @@ test.describe('Recipe Plate Cost', () => {
     await menuItemsPage.searchMenuItem(testNames.plateCostAlertRecipe);
     await menuItemsPage.verifyCostAlertStatus(testNames.plateCostAlertRecipe, 'On');
     results['Verify Cost Alert Status is On'] = 'passed';
+  });
+
+  // ==========================================
+  // Stage 10: Edit Plate Cost Alert
+  // ==========================================
+
+  test('Edit Plate Cost Alert Threshold', async () => {
+    await menuItemsPage.navigateToMenuItems();
+    await menuItemsPage.verifyMenuItemsPageLoaded();
+    await menuItemsPage.searchMenuItem(testNames.plateCostAlertRecipe);
+    await menuItemsPage.selectMenuItemCheckbox(testNames.plateCostAlertRecipe);
+    await menuItemsPage.clickManageCostAlerts();
+    await menuItemsPage.clickEditAlert();
+    await menuItemsPage.editCostAlertThreshold('15', '40');
+    await menuItemsPage.clickSaveChanges();
+    results['Edit Plate Cost Alert Threshold'] = 'passed';
+  });
+
+  test('Verify Cost Alert Status After Edit', async () => {
+    await menuItemsPage.searchMenuItem(testNames.plateCostAlertRecipe);
+    await menuItemsPage.verifyCostAlertStatus(testNames.plateCostAlertRecipe, 'On');
+    results['Verify Cost Alert Status After Edit'] = 'passed';
   });
 });
