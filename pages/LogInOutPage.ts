@@ -7,6 +7,7 @@ export class LogInOutPage extends BasePage {
   private readonly submitButton: Locator;
   private readonly userNameDropdown: Locator;
   private readonly signOutButton: Locator;
+  private readonly settingsButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -15,6 +16,7 @@ export class LogInOutPage extends BasePage {
     this.submitButton = page.locator('button[type="submit"]');
     this.userNameDropdown = page.locator('#userNameDropdown');
     this.signOutButton = page.locator('a, button, [role="menuitem"]').filter({ hasText: /sign out/i }).first();
+    this.settingsButton = page.locator('a[href="#/settings"]');
   }
 
   async goto() {
@@ -36,6 +38,16 @@ export class LogInOutPage extends BasePage {
     );
     await this.page.waitForLoadState('load', { timeout: TIMEOUT.extended });
     await this.page.waitForLoadState('networkidle', { timeout: TIMEOUT.extended }).catch(() => {});
+    await this.page.waitForTimeout(2000);
+  }
+
+  async navigateToSettings() {
+    await this.userNameDropdown.waitFor({ state: 'visible', timeout: TIMEOUT.extended });
+    await this.userNameDropdown.click();
+    await this.page.waitForTimeout(500);
+    await this.settingsButton.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await this.settingsButton.click();
+    await this.page.waitForLoadState('load', { timeout: TIMEOUT.extended });
     await this.page.waitForTimeout(2000);
   }
 

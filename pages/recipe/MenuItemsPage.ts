@@ -367,6 +367,44 @@ export class MenuItemsPage extends BasePage {
     return (await nameHeading.textContent())?.trim() || '';
   }
 
+  async verifyCostAlertStatus(name: string, expectedStatus: string) {
+    const row = this.page.getByRole('row').filter({ hasText: name }).first();
+    await row.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    const alertCell = row.locator(`[data-testid="plate-cost-cell-${expectedStatus}"]`);
+    await expect(alertCell).toBeVisible({ timeout: TIMEOUT.default });
+    await expect(alertCell).toHaveText(expectedStatus);
+  }
+
+  async selectMenuItemCheckbox(name: string) {
+    const row = this.page.getByRole('row').filter({ hasText: name }).first();
+    await row.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    const checkbox = row.getByRole('checkbox').first();
+    await checkbox.click();
+    await this.page.waitForTimeout(500);
+  }
+
+  async clickManageCostAlerts() {
+    const manageCostAlertsButton = this.page.getByRole('button', { name: /manage cost alerts/i });
+    await manageCostAlertsButton.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await manageCostAlertsButton.click();
+    await this.page.waitForTimeout(500);
+  }
+
+  async clickCreateCostAlert() {
+    const createOption = this.page.getByRole('menuitem', { name: /create cost alert/i });
+    await createOption.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await createOption.click();
+    await this.page.waitForTimeout(1000);
+  }
+
+  async clickSetAlert() {
+    const setAlertButton = this.page.getByRole('button', { name: /set alert/i });
+    await setAlertButton.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await setAlertButton.click();
+    await this.page.waitForLoadState('networkidle', { timeout: TIMEOUT.long });
+    await this.page.waitForTimeout(2000);
+  }
+
   async addMultipleMethods(methods: { text: string; filePath: string }[]) {
     const fixturesDir = path.resolve('fixtures', 'files', 'recipeMethod');
 

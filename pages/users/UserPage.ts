@@ -7,6 +7,9 @@ export class UserPage extends BasePage {
   private readonly showDropdownButton: Locator;
   private readonly userSearchInput: Locator;
   private readonly officeDropdown: Locator;
+  private readonly editButton: Locator;
+  private readonly rolesSelect: Locator;
+  private readonly emailInput: Locator;
   private readonly saveButton: Locator;
 
   constructor(page: Page) {
@@ -16,6 +19,9 @@ export class UserPage extends BasePage {
     this.showDropdownButton = page.locator('button.btn-info.dropdown-toggle');
     this.userSearchInput = page.locator('input[ng-model="filterValue"][placeholder="Search"]');
     this.officeDropdown = page.locator('select[name="office"]');
+    this.editButton = page.getByRole('button', { name: /edit/i }).first();
+    this.rolesSelect = page.locator('select[name="role"]');
+    this.emailInput = page.locator('input[type="email"][name="email"]');
     this.saveButton = page.getByRole('button', { name: /save/i }).first();
   }
 
@@ -61,9 +67,42 @@ export class UserPage extends BasePage {
     await this.page.waitForTimeout(3000);
   }
 
+  async clickEditUser() {
+    await this.editButton.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await this.editButton.click();
+    await this.page.waitForTimeout(2000);
+  }
+
+  async selectRoles(roleLabels: string[]) {
+    await this.rolesSelect.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await this.rolesSelect.selectOption(roleLabels.map((label) => ({ label })));
+    await this.page.waitForTimeout(500);
+  }
+
   async selectOffice(officeName: string) {
     await this.officeDropdown.waitFor({ state: 'visible', timeout: TIMEOUT.long });
     await this.officeDropdown.selectOption({ label: officeName });
+    await this.page.waitForTimeout(500);
+  }
+
+  async selectFirstOffice() {
+    await this.officeDropdown.waitFor({ state: 'visible', timeout: TIMEOUT.long });
+    const options = this.officeDropdown.locator('option');
+    const count = await options.count();
+    for (let i = 0; i < count; i++) {
+      const value = await options.nth(i).getAttribute('value');
+      if (value && value !== '?') {
+        await this.officeDropdown.selectOption({ index: i });
+        break;
+      }
+    }
+    await this.page.waitForTimeout(500);
+  }
+
+  async enterEmail(email: string) {
+    await this.emailInput.waitFor({ state: 'visible', timeout: TIMEOUT.default });
+    await this.emailInput.clear();
+    await this.emailInput.fill(email);
     await this.page.waitForTimeout(500);
   }
 
